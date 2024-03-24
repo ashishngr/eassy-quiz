@@ -18,5 +18,21 @@ exports.ERRORS = {
     BOTH_FASSWORD_MATCH: {
         status_code: 400,
         message: "Both password match"
+    }, 
+    MISSING_REQUIRED_QUIZ_FIELDS : {
+        status_code: 400,
+        message: "Missing required quiz field"
+    }, 
+    QUESTIONS_LIMIT_EXCEED: {
+        status_code: 400, 
+        message: "Questions can not be greater than 10 in a particular quiz"
+    }, 
+    SHARED_EMAIL_WRONG: {
+        status_code: 400, 
+        message: "Shared email array contaon wrong email"
+    }, 
+    NO_QUIZ_FOUND: {
+        status_code: 404, 
+        message: "No quiz found"
     }
 }

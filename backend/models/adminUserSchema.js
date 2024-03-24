@@ -74,35 +74,6 @@ AdminUserSchema.methods = {
     return bcrypt.compareSync(plainpassword, this.encrypted_password); // Use bcrypt for comparison
   },
 };
-
-// AdminUserSchema.virtual("password")
-// .set(function (password){
-//         this._password = password; 
-//         this.salt = process.env.PASSWORD_SALT; 
-//         this.encrypted_password = this.securePassword(password)
-// })
-// .get(function(){
-//     return this._password; 
-// }); 
-// AdminUserSchema.methods = {
-//     authenticate: function(plainpassword){
-//         return this.securePassword(plainpassword) === this.encrypted_password;
-//     }, 
-//     securePassword: function(plainpassword){
-//         console.log("Plain password", plainpassword);
-//         if(!plainpassword) return "No plain passoword"; 
-//         try {
-//             return crypto
-//             .createHmac("sha256", this.salt)
-//             .update(plainpassword)
-//             .digest("hex")
-//         } catch (error) {
-//             console.log(error);
-//             return error
-//         }
-//     }
-// }; 
-
 const AdminUser = mongoose.model("AdminUser", AdminUserSchema); 
 module.exports = {
     AdminUser
