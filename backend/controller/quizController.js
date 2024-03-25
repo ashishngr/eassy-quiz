@@ -163,15 +163,20 @@ QuizController.updateQuiz = async (req, res) => {
 
 QuizController.getAllQuiz = async(req, res) =>  {
     try {
-        const { id } = req.params; 
-
-        console.log("++", id)
-
-        const user = await AdminUser.findById( id ); 
+        const { userId } = req.params; 
+        const {skip = 0, limit = 10} = req.body; 
+        const user = await AdminUser.findById( userId ); 
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }
 
+        const pipeline = [
+            { $match : {creatorUserId : userId}},  //Filter by user ID
+            {$sort: {createdAt : -1}}, //Short by creation date
+            {$skip: skip}, 
+            {limit: limit}
+        ]
+            
         const quizs = await Quiz.find({ creatorUserId : id })
 
         let payload = {
@@ -187,3 +192,36 @@ QuizController.getAllQuiz = async(req, res) =>  {
     }
 }
 
+QuizController.singleQuiz = async(req, res) => {
+    try {
+        const { id } = req.params; 
+        const quiz = await Quiz.findById(id); 
+        if(!quiz){
+            return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
+        }
+        const payload = {
+            message: "Quiz find successfully",
+            data: quiz
+        }
+        res.status(200).json(payload);
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
+QuizController.deleteQuiz = async(req, res) =>{
+    try {
+        const { id } = req.params; 
+        const quiz = await Quiz.findByIdAndDelete( id ); 
+        if(!quiz){
+            return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
+        }
+        return res.status(200).json({
+            message: "Quiz delete successfully"
+        });
+
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
