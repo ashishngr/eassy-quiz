@@ -16,7 +16,7 @@ const {Schema} = mongoose;
 //     }
 // });
 const QuestionSchema = new mongoose.Schema({
-    questionText: {
+    text: {
         type: String, 
         required: true, 
         trim: true
@@ -105,6 +105,10 @@ const QuizSchema = new mongoose.Schema({
         type: Number, 
         required: true, 
     },
+    questions: {
+        type: [QuestionSchema], 
+        required: true
+    }, 
     formattedCreatedAt: { // Virtual field for formatted date
         type: String,
         get() {

@@ -25,6 +25,7 @@ QuizController.createQuiz = async (req, res) => {
             questions, 
             status
         } = req.body;
+        console.log("req body", req.body); 
 
         if( !title || !difficulty || !creatorUserId || !totalTime || !isPublic || !status){
             return ErrorUtils.APIErrorResponse(res, ERRORS.MISSING_REQUIRED_QUIZ_FIELDS);
@@ -81,12 +82,14 @@ QuizController.createQuiz = async (req, res) => {
             questions
         })
         await newQuiz.save(); 
+        
         var payload = {
             quiz: {
-                status: newQuiz.status, 
+                data: newQuiz, 
                 message: "Quiz create sucessfully"
             }
         }
+        console.log("quiz::=>", newQuiz); 
         res.status(200).json({
             payload
         });
