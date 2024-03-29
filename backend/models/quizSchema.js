@@ -2,40 +2,50 @@ const { text } = require("body-parser");
 const mongoose = require("mongoose"); 
 const {Schema} = mongoose; 
 
-const OptionSchema = new mongoose.Schema({
-    text: {
-        type: String, 
-        required: true, 
-        trim: true, 
-        maxlength: 225
-    },
-    isCorrect: {
-        type: Boolean, 
-        required: true, 
-        default: false
-    }
-});
+// const OptionSchema = new mongoose.Schema({
+//     text: {
+//         type: String, 
+//         required: true, 
+//         trim: true, 
+//         maxlength: 225
+//     },
+//     isCorrect: {
+//         type: Boolean, 
+//         required: true, 
+//         default: false
+//     }
+// });
 const QuestionSchema = new mongoose.Schema({
-    text: {
-        type: String,
-        required: true, 
-        trim: true, 
-        maxlength: 850, 
-    }, 
-    options: [OptionSchema]
-}); 
-const SharedEmailSchema = new mongoose.Schema({
-    email: {
+    questionText: {
         type: String, 
         required: true, 
-        trim: true, 
-        lowercase: true, 
-        validate: {
-            validator : (email) => /\S+@\S+\.\S+/.test(email),
-            message: "Invalid email"
-        }
+        trim: true
+    }, 
+    options: {
+        type: [String], 
+        required: true, 
+    }, 
+    correctOptionIndex: {
+        type: Number, 
+        required: true, 
+    }, 
+    marks: {
+        type: Number, 
+        required: true
     }
 }); 
+// const SharedEmailSchema = new mongoose.Schema({
+//     email: {
+//         type: String, 
+//         required: true, 
+//         trim: true, 
+//         lowercase: true, 
+//         validate: {
+//             validator : (email) => /\S+@\S+\.\S+/.test(email),
+//             message: "Invalid email"
+//         }
+//     }
+// }); 
 const QuizSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -46,17 +56,26 @@ const QuizSchema = new mongoose.Schema({
     description: {
         type: String, 
         true: true
-    }, 
-    questions: {
-        type: [QuestionSchema], 
-        required: true, 
-        validate: [(questions) => questions.length <=10], 
-        message: "Quiz can not have more than 10 questions"
     },
-    creatorUserId: {
+    category: {
+        type: String, 
+        optional: true
+    }, 
+    difficulty:{
+        type: String, 
+        required: true, 
+        enum: ["Eassy", "Medium", "Hard"]
+    },
+     creatorUserId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AdminUser', // Assuming a separate User model
         required: true,
+        index: true
+    },
+    creatorUserName: {
+        type: String,
+        required: true,
+        trim: true,
     },
     creatorUserEmail: {
         type: String, 
@@ -67,26 +86,32 @@ const QuizSchema = new mongoose.Schema({
             validator : (email) => /\S+@\S+\.\S+/.test(email),
             message: "Invalid email"
         }
-    } ,
-    creatorUserName: {
+    },
+    isPublic: {
+        "type": "Boolean",
+        "default": false,
+        "index": true  // Add index for efficient public/private filtering
+    },
+    sharedEmail: {
+        type: [String], 
+        optional: true, 
+    },
+   status: {
         type: String,
         required: true,
-        trim: true,
+        enum: ['PUBLISHED', 'DRAFT'], // Allowed status values
     },
-    
+    totalTime: {
+        type: Number, 
+        required: true, 
+    },
     formattedCreatedAt: { // Virtual field for formatted date
         type: String,
         get() {
           const date = new Date(this.createdAt);
           return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         },
-    },
-    sharedEmails: [SharedEmailSchema], // List of email addresses
-    status: {
-        type: String,
-        required: true,
-        enum: ['PUBLISHED', 'DRAFT'], // Allowed status values
-    },
+    },  
 },
 {
     collection: "Quiz", 
@@ -96,9 +121,7 @@ const QuizSchema = new mongoose.Schema({
     }, 
 }
 ); 
-// Indexing for performance
-QuizSchema.index({ title: 'text' }); // Enable text search on title
-QuizSchema.index({ creatorUserId: 1 }); // Index for creator lookup
+
 
 const Quiz = mongoose.model('Quiz', QuizSchema)
 module.exports = {

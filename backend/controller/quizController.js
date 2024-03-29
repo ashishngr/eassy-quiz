@@ -8,28 +8,54 @@ var ObjectId = mongoose.ObjectId;
 const {ERRORS} = require("../constants"); 
 const ErrorUtils = require("../utils/errorUtils"); 
 const EmailUtils = require("../utils/emailUtils"); 
-const PasswordUtils = require("../utils/passwordUtils");  
 
 const QuizController = module.exports; 
 
 QuizController.createQuiz = async (req, res) => {
-  
-    try {
-        const 
+    const 
         {
             title, 
             description, 
+            category, 
+            difficulty, 
+            creatorUserId, 
+            totalTime, 
+            isPublic, 
+            sharedEmail, 
             questions, 
-            sharedEmails, 
-            status, 
-            email
+            status
         } = req.body;
-        
-        if( !title || !questions  ||  !status || !email || !description){
+
+        if( !title || !difficulty || !creatorUserId || !totalTime || !isPublic || !status){
             return ErrorUtils.APIErrorResponse(res, ERRORS.MISSING_REQUIRED_QUIZ_FIELDS);
         }
-        const user = await AdminUser.findOne({email}); 
-        console.log("user email", user)
+        if(totalTime && totalTime <=0){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.TOTAL_TIME); 
+        }
+        if( !questions || !Array.isArray(questions) || questions.length < 3 ){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.LESS_NO_OF_QUESTIONS); 
+        }else{
+            for(const question of questions){
+                if( !question.text || !question.options || !Array.isArray(question.options) || question.options.length < 2 ){
+                    console.log("++", question.options.length)
+                    return ErrorUtils.APIErrorResponse(res, ERRORS.WRONG_QUESTION);
+                    break;
+                }
+                if(question.correctOptionIndex < 0 || question.correctOptionIndex >= question.options.length){
+                    console.log("+++", correctOptionIndex)
+                    console.log("4+", question.options.length)
+                    return ErrorUtils.APIErrorResponse(res, ERRORS.CORRECT_OPTION_UNAVAILABLE);
+                    break; 
+                }
+                if( !question.marks < 0 ){
+                    return ErrorUtils.APIErrorResponse(req, ERRORS.INCORRECT_MARKS); 
+                    break; 
+                }
+            }
+        }
+    try {      
+        const user = await AdminUser.findById(creatorUserId); 
+        console.log("user", user)
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
@@ -37,26 +63,22 @@ QuizController.createQuiz = async (req, res) => {
         if(questions.length >10){
             return ErrorUtils.APIErrorResponse(res, ERRORS.QUESTIONS_LIMIT_EXCEED)
         }; 
-        if(sharedEmails && sharedEmails.length > 0){
-            for(const emails of sharedEmails){
-                if(!EmailUtils.isValidEmail(email)){
-                    return ErrorUtils.APIErrorResponse(res, ERRORS.SHARED_EMAIL_WRONG);
-                }
-            }    
-        };
         let userId = user.id;
-        console.log("user id", userId); 
         let userName = user.first_name;
-        console.log("creator user name user name", userName)
+        let userEmail = user.email; 
         const  newQuiz = new Quiz({
             title, 
             description, 
-            questions,
+            category,
+            difficulty, 
             creatorUserId: userId, 
             creatorUserName: userName, 
-            creatorUserEmail: email,
-            sharedEmails, 
-            status
+            creatorUserEmail: userEmail,
+            isPublic,
+            sharedEmail,
+            totalTime,
+            status, 
+            questions
         })
         await newQuiz.save(); 
         var payload = {

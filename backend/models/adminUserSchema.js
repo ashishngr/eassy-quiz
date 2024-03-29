@@ -21,6 +21,10 @@ const AdminUserSchema = new Schema(
             required: true, 
             unique: true, 
         }, 
+        profilePick: {
+          type: String, 
+          optional: true
+        },
         encrypted_password: {
             type: String, 
             required: true

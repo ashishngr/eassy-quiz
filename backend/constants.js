@@ -34,5 +34,25 @@ exports.ERRORS = {
     NO_QUIZ_FOUND: {
         status_code: 404, 
         message: "No quiz found"
+    }, 
+    TOTAL_TIME: {
+        status_code: 400, 
+        message: "total time must be a positive number in minutes"
+    }, 
+    LESS_NO_OF_QUESTIONS: {
+        status_code: 400,
+        message: "Each quiz must have at least three questions"
+    }, 
+    WRONG_QUESTION: {
+        status_code: 400, 
+        message: "Each question must have text, at least two options, and other required fields"
+    }, 
+    CORRECT_OPTION_UNAVAILABLE: {
+        status_code: 400, 
+        message: "correctOptionIndex is out of range"
+    }, 
+    INCORRECT_MARKS: {
+        status_code: 400, 
+        message: "Question assign incorrect marks"
     }
 }
