@@ -100,81 +100,82 @@ QuizController.createQuiz = async (req, res) => {
 };
 
 QuizController.updateQuiz = async (req, res) => {
-    const { title, questions, description, sharedEmails } = req.body;
+    
 
     try {
+        const { 
+        title, 
+        description, 
+        category, 
+        difficulty, 
+        isPublic, 
+        sharedEmail, 
+        questions,
+        status
+     } = req.body;
+     console.log("-----", req.body); 
+     
         const { id } = req.params;
         console.log("Quiz ID:", id);
+        // Fetch the quiz document 
 
-        // Fetch the quiz document
-        const quiz = await Quiz.findOne({ _id: id });
+        console.log("questions ", questions)
+
+
+        const quiz = await Quiz.findById(id, 
+            id
+        );
 
         if (!quiz) {
-            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
-        }
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND)
+        }; 
 
         // Log retrieved quiz data for debugging (including question IDs)
         console.log("Retrieved quiz:", quiz);
 
+
         // Update allowed fields
         if (title) quiz.title = title;
         if (description) quiz.description = description;
+        if(category) quiz.category = category; 
+        if(difficulty) quiz.difficulty = difficulty; 
+        if(isPublic) quiz.isPublic = isPublic; 
+        if(sharedEmail) quiz.sharedEmail = sharedEmail; 
+        if(status) quiz.status = status; 
 
-        // Update questions (extensive debugging)
-        if (questions && questions.length > 0) {
-            console.log("Number of questions to update:", questions.length);
-            for (const updatedQuestion of questions) {
-                console.log("---- Updated Question ----");
-                console.log("Updated question ID (sent):", updatedQuestion._id);
 
-                // Ensure correct data type for _id (if necessary)
-                const updatedQuestionId = typeof updatedQuestion._id === 'string'
-                    ? mongoose.Types.ObjectId(updatedQuestion._id)
-                    : updatedQuestion._id;
-
-                const matchingQuestion = quiz.questions.find(
-                    (q) => q._id.equals(updatedQuestionId)
-                );
-                console.log("Matching question found:", !!matchingQuestion);
-
-                if (matchingQuestion) {
-                    console.log("Matching question ID:", matchingQuestion._id);
-                    // Update specific question text or options
-                    console.log("Update question text:", updatedQuestion.text);
-                    if (updatedQuestion.text) matchingQuestion.text = updatedQuestion.text;
-
-                    if (updatedQuestion.options) {
-                        console.log("Number of options to update:", updatedQuestion.options.length);
-                        // Update options efficiently using a loop
-                        for (const option of updatedQuestion.options) {
-                            console.log("---- Updated Option ----");
-                            console.log("Updated option ID:", option._id);
-                            const optionIndex = matchingQuestion.options.findIndex(
-                                (o) => o._id.toString() === option._id
-                            );
-                            console.log("Matching option index:", optionIndex);
-                            if (optionIndex !== -1) {
-                                if (option.text) matchingQuestion.options[optionIndex].text = option.text;
-                                if (option.isCorrect !== undefined) {
-                                    matchingQuestion.options[optionIndex].isCorrect = option.isCorrect;
-                                }
-                            } else {
-                                console.warn("Option with ID", option._id, "not found in matching question");
-                            }
-                        }
-                    }
-                } else {
-                    console.warn("Updated question with ID", updatedQuestion._id, "not found in quiz");
-                }
+//===========================================================================
+        //TODO: Function to update individual question
+        const updateQuestions = (quiz, questionUpdates) => {
+            console.log("quiz======>", quiz.questions); 
+            console.log("questionUpdates", questionUpdates)
+            if (!quiz.questions) { // Handle missing questions array
+                console.warn("Quiz has no questions to update");
+                return; // Optionally return an error or throw an exception
             }
-        }
+            for (const questionUpdate of questionUpdates || []) { // Handle empty questions array
+              const questionIndex = questionUpdate._id ?
+                quiz.questions.findIndex(q => q._id.toString() === questionUpdate._id) :
+                questionUpdate.index;
+      
+              if (questionIndex !== -1) {
+                // Apply updates using Mongoose operators (e.g., $set, $unset)
+                if (questionUpdate._id) { // Update specific question by ID
+                  quiz.questions.id(questionUpdate._id).$set = questionUpdate;
+                } else { // Update question by index (if no ID provided)
+                  quiz.questions.$set[questionIndex] = questionUpdate;
+                }
+              } else {
+                // Throw an error or return a specific response for missing question
+                throw new Error(`Question update with ID/index ${questionUpdate._id || questionUpdate.index} not found in quiz`);
+              }
+            }
+          };
 
-        // Update shared emails
-        quiz.sharedEmails = sharedEmails;
-
-        // Save the updated quiz
-        await quiz.save();
-
+//====================================================
+        updateQuestions(quiz, questions); 
+         // Save the updated quiz with validation
+        await quiz.save({ validateBeforeSave: true });
         const payload = {
             message: "Quiz updated successfully",
             data: quiz,
