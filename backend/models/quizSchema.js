@@ -2,19 +2,6 @@ const { text } = require("body-parser");
 const mongoose = require("mongoose"); 
 const {Schema} = mongoose; 
 
-// const OptionSchema = new mongoose.Schema({
-//     text: {
-//         type: String, 
-//         required: true, 
-//         trim: true, 
-//         maxlength: 225
-//     },
-//     isCorrect: {
-//         type: Boolean, 
-//         required: true, 
-//         default: false
-//     }
-// });
 const QuestionSchema = new mongoose.Schema({
     text: {
         type: String, 
@@ -34,18 +21,7 @@ const QuestionSchema = new mongoose.Schema({
         required: true
     }
 }); 
-// const SharedEmailSchema = new mongoose.Schema({
-//     email: {
-//         type: String, 
-//         required: true, 
-//         trim: true, 
-//         lowercase: true, 
-//         validate: {
-//             validator : (email) => /\S+@\S+\.\S+/.test(email),
-//             message: "Invalid email"
-//         }
-//     }
-// }); 
+
 const QuizSchema = new mongoose.Schema({
     title: {
         type: String,
