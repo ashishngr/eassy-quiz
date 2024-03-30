@@ -207,7 +207,14 @@ QuizController.getAllQuiz = async(req, res) =>  {
 
 QuizController.singleQuiz = async(req, res) => {
     try {
+        const creatorId = req.user.id; 
         const { id } = req.params; 
+
+        const creatorUser = await AdminUser.find({_id: creatorId}); 
+        if(!creatorUser){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+        }
+
         const quiz = await Quiz.findById(id); 
         if(!quiz){
             return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
@@ -225,6 +232,11 @@ QuizController.singleQuiz = async(req, res) => {
 QuizController.deleteQuiz = async(req, res) =>{
     try {
         const { id } = req.params; 
+        const creatorId = req.user.id; 
+        const creatorUser = await AdminUser.find({_id: creatorId}); 
+        if(!creatorUser){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+        }
         const quiz = await Quiz.findByIdAndDelete( id ); 
         if(!quiz){
             return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
