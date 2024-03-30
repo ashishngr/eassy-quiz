@@ -70,13 +70,12 @@ AuthController.signin = async(req, res) => {
         }
         console.log("password match"); 
         const payload = {
-            admin: {
+            user: {
                 id: admin.id, 
                 role: "Admin User"
             }
         }
         const accessToken = AdminAuthHelper.createJWTToken(payload); 
-        console.log("access token genrate")
         return res.status(200).json({
             access_token: accessToken, 
             message: "User credentials match successfully"
@@ -109,7 +108,6 @@ AuthController.deleteUser = async(req, res) => {
 AuthController.updatePassword = async(req, res) => {
     const {id, currentPassword, newPassword} = req.body; 
     try {
-        console.log(id, newPassword, currentPassword); 
         if(!id || !currentPassword || !newPassword){
             return ErrorUtils.APIErrorResponse(res, ERRORS.GENERIC_BAD_REQUEST); 
         }

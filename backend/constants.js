@@ -54,5 +54,9 @@ exports.ERRORS = {
     INCORRECT_MARKS: {
         status_code: 400, 
         message: "Question assign incorrect marks"
+    }, 
+    PAGINATION_ERROR: {
+        status_code: 403, 
+        message: "Pagination error"
     }
 }

@@ -2,12 +2,12 @@ const express = require('express');
 const {Quiz} = require("../models/quizSchema"); 
 const {AdminUser} = require("../models/adminUserSchema")
 var mongoose = require("mongoose"); 
-
-var ObjectId = mongoose.ObjectId; 
+var ObjectId = mongoose.Types.ObjectId; 
 
 const {ERRORS} = require("../constants"); 
 const ErrorUtils = require("../utils/errorUtils"); 
 const EmailUtils = require("../utils/emailUtils"); 
+const { Admin } = require('mongodb');
 
 const QuizController = module.exports; 
 
@@ -133,7 +133,7 @@ QuizController.updateQuiz = async (req, res) => {
         const questionToModify = questionUpdate._id
           ? quiz.questions.find(q => q._id.toString() === questionUpdate._id)
           : quiz.questions[questionUpdate.index];
-            
+
         if (questionToModify) {
           // 4. Update specific question properties
           questionToModify.text = questionUpdate.text ? questionUpdate.text : questionToModify.text;
@@ -162,30 +162,43 @@ QuizController.updateQuiz = async (req, res) => {
 };
 
 QuizController.getAllQuiz = async(req, res) =>  {
+//TODO: controller to fetch all the queries created by a specific user
+    
     try {
-        const { userId } = req.params; 
-        const {skip = 0, limit = 10} = req.body; 
-        const user = await AdminUser.findById( userId ); 
-        if(!user){
+        const creatorId = req.user.id; 
+        const creatorUser = await AdminUser.find({_id: creatorId}); 
+        if(!creatorUser){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }
+        var {limit, page} = req.query; 
+        if(!limit || !page){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.PAGINATION_ERROR); 
+        }; 
+        page = page || 1; 
+        limit = limit || 5; 
+        let skip = (page - 1) * limit; 
+        
+        let query = {creatorUserId : new ObjectId(creatorId)}; 
 
-        const pipeline = [
-            { $match : {creatorUserId : userId}},  //Filter by user ID
-            {$sort: {createdAt : -1}}, //Short by creation date
-            {$skip: skip}, 
-            {limit: limit}
-        ]
-            
-        const quizs = await Quiz.find({ creatorUserId : id })
-
-        let payload = {
-            message: "Successfully returned all the quizes", 
-            data: quizs
+        const quizList = await Quiz.aggregate([
+            {
+                $match : query
+            }, 
+            {
+                $skip: skip
+            }, 
+            {
+                $limit: parseInt(limit)
+            }
+        ]); 
+        const totalCount = await Quiz.countDocuments(query); 
+        const payload = {
+            data: quizList, 
+            totalQuiz: totalCount, 
+            currentPage: page 
         }
-        res.status(200).json({
-            payload
-        })
+        return res.status(200).json(payload)
+
     } catch (error) {
         console.log(error);
         return ErrorUtils.APIErrorResponse(res);
