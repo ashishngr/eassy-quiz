@@ -37,7 +37,7 @@ const AdminUserSchema = new Schema(
         },
         role: {
             type: String, 
-            enum: ["ADMIN", "VISITOR"], 
+            enum: ["ADMIN", "VISITOR", "SUPERADMIN"], 
             default: "ADMIN", 
             required: true
         }, 
