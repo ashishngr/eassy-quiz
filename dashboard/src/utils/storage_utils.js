@@ -6,11 +6,11 @@ const STORAGE_KEYS = {
 }; 
 
 StorageUtils.getAPIToken = () => localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN); 
-StorageUtils.setAPIToken = () => localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token); 
+StorageUtils.setAPIToken = (token) => localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token); 
 
 StorageUtils.getUserProfile = () => {
     try {
-        return JSON.parse(locakStorage.getItem(STORAGE_KEYS.USER_PROFILE))
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PROFILE))
     } catch (error) {
         return null; 
     }

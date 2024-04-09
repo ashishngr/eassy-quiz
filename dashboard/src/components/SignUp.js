@@ -1,4 +1,11 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+// import  API  from "../common/apis";
+import {useNavigate} from 'react-router-dom';
+import validateFormData from '../utils/validateFormData';
+
+// const API  = require("../common/apis"); 
+import API from "../common/apis"
+
 
 const SignUp = () => {
     const [first_Name, setFirst_Name] = useState(''); 
@@ -7,6 +14,8 @@ const SignUp = () => {
     const [password, setPassword] = useState(''); 
     const [showSuccess, setShowSuccess] = useState(false); // State for success toast
     const [showError, setShowError] = useState(false); // State for error toast
+
+    const navigate = useNavigate(); 
 
 
     const handleChange = (event) => {
@@ -28,14 +37,61 @@ const SignUp = () => {
             break;  
         }
     }
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault(); 
+
         console.log('Form submitted', {
             first_Name, 
             last_Name, 
             email, 
             password
         })
+        const formData = {
+            first_name : first_Name, 
+            last_name : last_Name, 
+            email : email, 
+            password : password, 
+        }
+        const validationErrors = validateFormData(formData);
+        if (validationErrors.length > 0) {
+            // Display validation errors to the user (e.g., using a state variable)
+            setShowError(true); // Set error state for displaying a toast
+            return; // Prevent API call if form is invalid
+        }
+        try {
+            // Send signup request
+            const response = await API.signUpAdmin(formData);
+        
+            if (response.status === 200) {
+              // Signup successful
+              console.log('Signup successful!');
+        
+              // Clear form fields
+              setFirst_Name('');
+              setLast_Name('');
+              setEmail('');
+              setPassword('');
+              navigate('/admin/dashboard/home') 
+        
+              // Optional: Show success message to user (using toast)
+            //   setShowSuccess(true); // Set success state for displaying a toast
+        
+              // Optional: Redirect to login page after successful signup
+              // navigate('/login'); // Use useNavigate hook after a delay or conditionally
+            } else {
+              // Handle signup error
+              console.error('Signup failed:', response.data.message);
+        
+              // Optional: Show error message to user based on response status or data
+            //   setShowError(true); // Set error state for displaying a toast with specific error message
+            }
+          } catch (error) {
+            // Handle unexpected errors
+            console.error('Unexpected error:', error);
+        
+            // Optional: Show generic error message to user (using toast)
+            setShowError(true); // Set error state for displaying a toast with generic error message
+          }
     }
   return (
    <div className='flex min-h-screen items-center justify-center'>
