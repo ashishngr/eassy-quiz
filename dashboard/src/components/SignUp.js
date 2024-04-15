@@ -1,9 +1,13 @@
 import React, {useState, useEffect} from 'react'
-// import  API  from "../common/apis";
 import {useNavigate} from 'react-router-dom';
-import validateFormData from '../utils/validateFormData';
+import { IoMdEye } from "react-icons/io";
+import { FaRegEyeSlash } from "react-icons/fa6";
+import { ToastContainer, toast } from 'react-toastify';
 
-// const API  = require("../common/apis"); 
+
+import validateFormData from '../utils/validateFormData';
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS for styling
+
 import API from "../common/apis"
 
 
@@ -12,8 +16,9 @@ const SignUp = () => {
     const [last_Name, setLast_Name] = useState(''); 
     const [email, setEmail] = useState(''); 
     const [password, setPassword] = useState(''); 
-    const [showSuccess, setShowSuccess] = useState(false); // State for success toast
     const [showError, setShowError] = useState(false); // State for error toast
+    const [responseMessage, setResponseMessage] = useState('')
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate(); 
 
@@ -37,6 +42,8 @@ const SignUp = () => {
             break;  
         }
     }
+  
+
     const handleSubmit = async (event) => {
         event.preventDefault(); 
 
@@ -54,47 +61,62 @@ const SignUp = () => {
         }
         const validationErrors = validateFormData(formData);
         if (validationErrors.length > 0) {
-            // Display validation errors to the user (e.g., using a state variable)
-            setShowError(true); // Set error state for displaying a toast
-            return; // Prevent API call if form is invalid
+            setShowError(true); 
+            return; 
         }
         try {
             // Send signup request
             const response = await API.signUpAdmin(formData);
-        
             if (response.status === 200) {
               // Signup successful
-              console.log('Signup successful!');
-        
+              console.log('Signup successful!: ', response);
               // Clear form fields
               setFirst_Name('');
               setLast_Name('');
               setEmail('');
               setPassword('');
+
+              toast.success(response.data.message, {
+                position: "top-right",
+                autoClose: 2000, // Close after 2 seconds
+                hideProgressBar: true, // Hide progress bar
+              });
               navigate('/admin/dashboard/home') 
-        
-              // Optional: Show success message to user (using toast)
-            //   setShowSuccess(true); // Set success state for displaying a toast
-        
-              // Optional: Redirect to login page after successful signup
-              // navigate('/login'); // Use useNavigate hook after a delay or conditionally
-            } else {
-              // Handle signup error
-              console.error('Signup failed:', response.data.message);
-        
-              // Optional: Show error message to user based on response status or data
-            //   setShowError(true); // Set error state for displaying a toast with specific error message
+              
+            } else{
+                console.error('Signup failed:', response.data);
+                setResponseMessage(getErrorMsgFromResponse(response.data));
+                setShowError(true);
             }
           } catch (error) {
-            // Handle unexpected errors
-            console.error('Unexpected error:', error);
-        
-            // Optional: Show generic error message to user (using toast)
-            setShowError(true); // Set error state for displaying a toast with generic error message
+                console.error('Unexpected error:', error);
+                setResponseMessage('An unexpected error occurred. Please try again.');
+                setShowError(true); 
           }
     }
+    const getErrorMsgFromResponse = (responseData) => {
+       
+        if (responseData.message) {
+          return responseData.message;
+        } else {
+          return 'An error occurred during signup. Please try again.';
+        }
+      };
+
+    useEffect(()=>{
+        if(showError){
+            const timeoutId = setTimeout(()=> setShowError(false), 5000) 
+            return () => clearTimeout(timeoutId); 
+        }
+    }, [showError]);  
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    
   return (
    <div className='flex min-h-screen items-center justify-center'>
+    <ToastContainer />
         <form className='w-full max-w-md px-8 py-6 bg-white rounded shadow-md border border-gray-300' onSubmit={handleSubmit}>
             <h2 className="text-2xl font-semibold mb-4 text-center">Register for Free Account</h2>
             <div className='mb-4'>
@@ -143,20 +165,27 @@ const SignUp = () => {
                     required
                 />
             </div>
-            <div className='mb-4'>
+            <div className='mb-4 '>
                 <label htmlFor="Password" className="block text-sm font-medium text-gray-700">
                     Password
                 </label>
-                <input
-                    type="text"
-                    id="email"
+                <div class="relative flex items-center">
+                    <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
                     name="password"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your password" 
+                    class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 pl-10"  placeholder="Enter your password"
                     value={password}
                     onChange={handleChange}
                     required
-                />
+                    />
+                    <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    class="absolute inset-y-0 right-0 cursor-pointer px-3"  >
+                    {showPassword ? <IoMdEye className="w-5 h-5 text-gray-500 hover:text-gray-700" /> : <FaRegEyeSlash className="w-5 h-5 text-gray-500 hover:text-gray-700" />}
+                    </button>
+                </div>
             </div>
             <button
             type="submit"
@@ -169,6 +198,24 @@ const SignUp = () => {
                 <a href="/login" className="text-sm text-blue-500 hover:underline">Login here</a>
             </div>
         </form>
+        {showError && (
+            <div className="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md fixed top-0 right-0 mt-4 mr-4 z-50">
+            <div className="flex items-center justify-center w-12 bg-red-500">
+                <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 3.36667C10.8167 3.36667 3.3667 10.8167 3.3667 20C3.3667 29.1833 10.8167 36.6333 20 36.6333C29.1834 36.6333 36.6334 29.1833 36.6334 20C36.6334 10.8167 29.1834 3.36667 20 3.36667ZM19.1334 33.3333V22.9H13.3334L21.6667 6.66667V17.1H27.25L19.1334 33.3333Z" />
+                </svg>
+            </div>
+        
+            <div className="px-4 py-2 -mx-3">
+                <div className="mx-3">
+                    <span className="font-semibold text-red-500 dark:text-red-400">Error</span>
+                    <p class="text-sm text-gray-600 dark:text-gray-200">
+                        {responseMessage}
+                    </p>
+                </div>
+            </div>
+        </div>
+        )}
    </div>
   )
 }
