@@ -9,11 +9,11 @@ const DashboardLayout = () => {
       {/* Sidebar */}
       <SideBar />
 
-      {/* Main content */}
-      <div className="flex-1 px-6 pt-4">
+     {/* Main content */}
+     <main className="flex-grow px-6 pt-4 overflow-y-auto">
         {/* Outlet for nested routes */}
         <Outlet />
-      </div>
+      </main>
     </div>
   )
 }
