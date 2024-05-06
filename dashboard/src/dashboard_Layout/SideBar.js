@@ -18,28 +18,28 @@ const SideBar = () => {
         </h1>
       </div>
       <ul className="mt-3 space-y-2 ">
-        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-800 hover:text-white hover:rounded-lg">
+        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 hover:text-white  hover:rounded-lg">
           {<MdHomeMax className='mr-2'/>}
-            <a href="/" className="flex items-center justify-center gap-2 text-sm" >
+            <a href="/admin/dashboard/home" className="flex items-center justify-center gap-2 text-sm" >
               Home
             </a>
         </li>
-        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-800 hover:text-white hover:rounded-lg">
+        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 hover:text-white hover:rounded-lg">
           {<MdOutlineQuiz className='mr-2'/>}
           <a href="/admin/dashboard/quiz" className="flex items-center justify-center gap-2 text-sm ">
              Quiz
           </a>
         </li>
-        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-800 hover:text-white hover:rounded-lg ">
+        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 hover:text-white hover:rounded-lg ">
         {<TbBrandGoogleAnalytics className='mr-2'/>}
-          <a href="/" className="flex items-center justify-center gap-2 text-sm ">
+          <a href="/admin/dashboard/analytics" className="flex items-center justify-center gap-2 text-sm ">
            Analytic
           </a>
         </li>
-        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-800 hover:text-white hover:rounded-lg">
+        <li className="w-52 py-2 px-3 flex items-center hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 hover:text-white hover:rounded-lg">
         {<CgProfile className='mr-2'/> }
-          <a href="/" className="flex items-center justify-center gap-2 text-sm ">
-          Profile
+          <a href="/admin/dashboard/profile" className="flex items-center justify-center gap-2 text-sm ">
+            Profile
           </a>
         </li>
       </ul>
