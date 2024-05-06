@@ -63,10 +63,11 @@ const QuizSchema = new mongoose.Schema({
             message: "Invalid email"
         }
     },
-    isPublic: {
-        "type": "Boolean",
-        "default": false,
-        "index": true  // Add index for efficient public/private filtering
+    scope: {
+        type: String,
+        required: true, 
+        enum: ['Public', 'Private'],
+        index: true  // Add index for efficient public/private filtering
     },
     sharedEmail: {
         type: [String], 
@@ -75,7 +76,7 @@ const QuizSchema = new mongoose.Schema({
    status: {
         type: String,
         required: true,
-        enum: ['PUBLISHED', 'DRAFT'], // Allowed status values
+        enum: ['Published', 'Draft'], // Allowed status values
     },
     totalTime: {
         type: Number, 
