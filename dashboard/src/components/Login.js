@@ -14,7 +14,8 @@ const Login = () => {
     const [password, setPassword] = useState('');  
     const [showError, setShowError] = useState(false); // State for error toast
     const [responseMessage, setResponseMessage] = useState('')
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); 
+
     const navigate = useNavigate(); 
 
     const handleChange = (event) => {
@@ -123,7 +124,7 @@ const Login = () => {
             </button>
             <div className="text-center mt-4">
                 <span className="text-sm text-gray-500">Don't have an account? </span>
-                <a href="/login" className="text-sm text-blue-500 hover:underline">Signup here</a>
+                <a href="/signup" className="text-sm text-blue-500 hover:underline">Signup here</a>
             </div>
         </form>
         {showError && (

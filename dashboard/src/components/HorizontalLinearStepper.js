@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -12,7 +13,30 @@ const steps = ['Quiz Details', 'Question and Annswer'];
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
+  const [skipped, setSkipped] = React.useState(new Set()); 
+  const [questions, setQuestions] = useState([{ questionText: '', options: ['', '', ''], correctOption: '' }]);
+
+  
+  const handleInputChange = (index, field, value) => {
+    const updatedQuestions = [...questions];
+    if (field.startsWith('option')) {
+      const optionIndex = parseInt(field.replace('option', ''), 10);
+      updatedQuestions[index].options[optionIndex] = value;
+    } else {
+      updatedQuestions[index][field] = value;
+    }
+    setQuestions(updatedQuestions);
+  };
+  const handleAddQuestion = () => {
+    setQuestions([...questions, { questionText: '', options: ['', '', ''], correctOption: '' }]);
+  };
+  const handleDeleteQuestion = (index) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions.splice(index, 1);
+    setQuestions(updatedQuestions);
+  };
+ 
+
 
   const isStepOptional = (step) => {
     return step === 1;
@@ -56,6 +80,9 @@ export default function HorizontalLinearStepper() {
     setActiveStep(0);
   };
 
+  const isSaveDisabled = questions.length < 3;
+
+
   return (
     <Box sx={{ width: '100%' }}>
       <Stepper activeStep={activeStep}>
@@ -75,20 +102,29 @@ export default function HorizontalLinearStepper() {
           Last step 
         </Typography>
       </React.Fragment>
-      ) : ( activeStep == 1 ? (
+      ) : ( activeStep === 1 ? (
         <React.Fragment>
         <Typography sx={{ mt: 2, mb: 1 }}>
           <div className='flex flex-row-reverse gap-4 items-center p-10 justify-content-flex-end'>
               
-            <Button variant="contained" size="medium">
+            <Button variant="contained" size="medium" disabled={isSaveDisabled}>
                 Save
             </Button>
-            <Button variant="contained" size="medium">
+            <Button variant="contained" size="medium"  onClick={handleAddQuestion}>
                 Add Question 
             </Button>
-             
           </div>
-          <QuestionForm />
+          {questions.map((question, index) => (
+            <QuestionForm 
+            key={index} 
+            index={index} 
+            question={question}
+            questions={questions}
+            onChange={handleInputChange}
+            onDelete={handleDeleteQuestion} 
+            />
+          ))}
+          
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button

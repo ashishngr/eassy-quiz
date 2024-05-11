@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -6,10 +6,12 @@ import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 
-const QuizQuestion = () => {
+const QuizQuestion = () => { 
+
   return (
     <div className='max-w-md mx-auto'>
         <Accordion>
+            
             <AccordionSummary 
              expandIcon={<ArrowDownwardIcon />}
              aria-controls="panel1-content"
