@@ -86,6 +86,10 @@ const QuizSchema = new mongoose.Schema({
     questions: {
         type: [QuestionSchema], 
         required: true
+    },
+    isDraft: {
+        type: Boolean,
+        default: false
     }, 
     formattedCreatedAt: { // Virtual field for formatted date
         type: String,

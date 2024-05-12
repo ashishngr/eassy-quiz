@@ -23,8 +23,10 @@ QuizController.createQuiz = async (req, res) => {
             isPublic, 
             sharedEmail, 
             questions, 
-            status
+            status, 
+            isDraft
         } = req.body;
+
         console.log("req body", req.body); 
 
         if( !title || !difficulty || !creatorUserId || !totalTime || !isPublic || !status){
@@ -81,6 +83,11 @@ QuizController.createQuiz = async (req, res) => {
             status, 
             questions
         })
+        if (isDraft) {
+            newQuizData.status = 'Draft';
+            newQuizData.isDraft = true;
+        }
+        
         await newQuiz.save(); 
         
         var payload = {
