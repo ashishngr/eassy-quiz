@@ -31,7 +31,7 @@ const QuizSchema = new mongoose.Schema({
     }, 
     description: {
         type: String, 
-        true: true
+        optional: true
     },
     category: {
         type: String, 
@@ -76,7 +76,8 @@ const QuizSchema = new mongoose.Schema({
    status: {
         type: String,
         required: true,
-        enum: ['Published', 'Draft'], // Allowed status values
+        default: 'Published',
+        enum: ['Published', 'Draft', 'Deleted'], // Allowed status values
     },
     totalTime: {
         type: Number, 
