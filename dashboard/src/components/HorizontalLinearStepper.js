@@ -15,6 +15,7 @@ export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set()); 
   const [questions, setQuestions] = useState([{ questionText: '', options: ['', '', ''], correctOption: '' }]);
+  const [quizIntroData, setQuizIntroData] = useState({});
 
   
   const handleInputChange = (index, field, value) => {
@@ -27,16 +28,16 @@ export default function HorizontalLinearStepper() {
     }
     setQuestions(updatedQuestions);
   };
+
   const handleAddQuestion = () => {
     setQuestions([...questions, { questionText: '', options: ['', '', ''], correctOption: '' }]);
   };
+
   const handleDeleteQuestion = (index) => {
     const updatedQuestions = [...questions];
     updatedQuestions.splice(index, 1);
     setQuestions(updatedQuestions);
   };
- 
-
 
   const isStepOptional = (step) => {
     return step === 1;
@@ -46,8 +47,10 @@ export default function HorizontalLinearStepper() {
     return skipped.has(step);
   };
 
-  const handleNext = () => {
+  const handleNext = (e, formData) => {
+    e.preventDefault();
     let newSkipped = skipped;
+    setQuizIntroData(formData);
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
@@ -60,6 +63,8 @@ export default function HorizontalLinearStepper() {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
+
+
 
   const handleSkip = () => {
     if (!isStepOptional(activeStep)) {
@@ -80,7 +85,21 @@ export default function HorizontalLinearStepper() {
     setActiveStep(0);
   };
 
-  const isSaveDisabled = questions.length < 3;
+  const isSaveDisabled = questions.length < 3; 
+
+  const handleSaveQuiz = () => {
+    // Combine intro data and questions data and save the quiz
+    const quizData = { ...quizIntroData,  questions: questions };
+    console.log('Quiz Data:', quizData); // Log the quiz data to console
+  };
+
+  const handleSaveQuizIntro = (formData) => {
+    setQuizIntroData(formData); // Save quiz intro data
+  };
+
+  const handleSaveQuestions = (questions) => {
+    setQuestions(questions); // Save questions data
+  };
 
 
   return (
@@ -107,7 +126,7 @@ export default function HorizontalLinearStepper() {
         <Typography sx={{ mt: 2, mb: 1 }}>
           <div className='flex flex-row-reverse gap-4 items-center p-10 justify-content-flex-end'>
               
-            <Button variant="contained" size="medium" disabled={isSaveDisabled}>
+            <Button variant="contained" size="medium" disabled={isSaveDisabled} onClick={() => handleSaveQuiz(quizIntroData, questions)}>
                 Save
             </Button>
             <Button variant="contained" size="medium"  onClick={handleAddQuestion}>
@@ -122,6 +141,7 @@ export default function HorizontalLinearStepper() {
             questions={questions}
             onChange={handleInputChange}
             onDelete={handleDeleteQuestion} 
+            onSave={handleSaveQuiz} // Pass the save function to each QuestionForm
             />
           ))}
           
@@ -145,10 +165,15 @@ export default function HorizontalLinearStepper() {
           </Box>
       </React.Fragment> ): (  
          <React.Fragment>
-         <Typography sx={{ mt: 2, mb: 1 }}>
-           <QuizIntroForm />
+         <Typography sx={{ mt: 2, mb: 1}}>
+          <QuizIntroForm onSave={handleSaveQuizIntro}/>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button variant="contained" onClick={handleNext} >
+              Next
+            </Button>
+          </div>
          </Typography>
-         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+         {/* <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"
               disabled={activeStep === 0}
@@ -164,37 +189,10 @@ export default function HorizontalLinearStepper() {
             >
               Next
             </Button>
-          </Box>
+          </Box> */}
        </React.Fragment>
       )
       )}
-      {/* {activeStep === steps.length ? (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
-          </Typography>
-        </React.Fragment>
-      ) : ( 
-        <React.Fragment>
-        
-          <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Back
-            </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
-          </Box>
-        </React.Fragment>
-      )} */}
     </Box>
   );
 }

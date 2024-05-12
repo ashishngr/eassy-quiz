@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';  
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Button } from '@mui/material';
+
 // import QuizQuestion from './QuizQuestion'
 
 const QuestionForm = ({ index, question, onChange, onDelete, questions }) => {
@@ -14,8 +15,11 @@ const QuestionForm = ({ index, question, onChange, onDelete, questions }) => {
         const { name, value } = event.target;
         onChange(index, name, value);
     };
+    const handleOptionChange = (optionIndex, value) => {
+        onChange(index, `option${optionIndex}`, value);
+    };
   return (
-    <form>
+    <form >
       <div className='max-w-2xl mx-auto mb-2'>
         <Accordion>
             <AccordionSummary 
@@ -36,10 +40,11 @@ const QuestionForm = ({ index, question, onChange, onDelete, questions }) => {
                     
                 </div>
                 <div>
-                    <label for="question-text" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Question Text</label>
-                    <input type="text" id="question-text" name='question-text' className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  
+                    <label for="questionText" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Question Text</label>
+                    <input type="text" id="questionText" name='questionText' className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  
                     placeholder=" " 
                     required 
+                    value={question.text}
                     onChange={handleInputChange}
                     />
                 </div>
@@ -62,14 +67,15 @@ const QuestionForm = ({ index, question, onChange, onDelete, questions }) => {
                     ) 
                 })}
                 <div>
-                    <label for="correct_answer" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correct Answer</label>
+                    <label for="correctOption" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correct Answer</label>
                     <input 
                     type="text" 
-                    id="correct_answer" 
-                    name={`correctOption${index}`} 
+                    id="correctOption" 
+                    name='correctOption' 
                     className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  
                     placeholder=" " 
                     required
+                    value={question.correctOption}
                     onChange={handleInputChange}
                     />
                 </div>
