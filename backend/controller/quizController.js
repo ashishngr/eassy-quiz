@@ -38,6 +38,7 @@ QuizController.createQuizMetaData = async (req, res) => {
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
+        console.log("-->", creatorUserId)
 
         let userId = user.id;
         let userName = user.first_name;
