@@ -39,7 +39,6 @@ const AdminUserSchema = new Schema(
             type: String, 
             enum: ["ADMIN", "VISITOR", "SUPERADMIN"], 
             default: "ADMIN", 
-            required: true
         }, 
         user_profile: {
             type: String

@@ -58,5 +58,9 @@ exports.ERRORS = {
     PAGINATION_ERROR: {
         status_code: 403, 
         message: "Pagination error"
+    }, 
+    QUIZ_STATUS_IN_NOT_DRAFT : {
+        status_code: 400, 
+        message: 'Quiz status is not draft'
     }
 }

@@ -11,65 +11,38 @@ const { Admin } = require('mongodb');
 
 const QuizController = module.exports; 
 
-QuizController.createQuiz = async (req, res) => {
+QuizController.createQuizMetaData = async (req, res) => {
     const 
         {
             title, 
             description, 
             category, 
             difficulty, 
-            creatorUserId, 
-            totalTime, 
-            isPublic, 
-            sharedEmail, 
-            questions, 
-            status, 
-            isDraft
+            scope, 
+            sharedEmails, 
+            isDraft, 
+            timeOut
         } = req.body;
 
-        console.log("req body", req.body); 
+        console.log("req body", title, difficulty, timeOut, scope); 
 
-        if( !title || !difficulty || !creatorUserId || !totalTime || !isPublic || !status){
+        if( !title || !difficulty || !timeOut || !scope){
             return ErrorUtils.APIErrorResponse(res, ERRORS.MISSING_REQUIRED_QUIZ_FIELDS);
         }
-        if(totalTime && totalTime <=0){
+        if(timeOut && timeOut <=0){
             return ErrorUtils.APIErrorResponse(res, ERRORS.TOTAL_TIME); 
         }
-        if( !questions || !Array.isArray(questions) || questions.length < 3 ){
-            return ErrorUtils.APIErrorResponse(res, ERRORS.LESS_NO_OF_QUESTIONS); 
-        }else{
-            for(const question of questions){
-                if( !question.text || !question.options || !Array.isArray(question.options) || question.options.length < 2 ){
-                    console.log("++", question.options.length)
-                    return ErrorUtils.APIErrorResponse(res, ERRORS.WRONG_QUESTION);
-                    break;
-                }
-                if(question.correctOptionIndex < 0 || question.correctOptionIndex >= question.options.length){
-                    console.log("+++", correctOptionIndex)
-                    console.log("4+", question.options.length)
-                    return ErrorUtils.APIErrorResponse(res, ERRORS.CORRECT_OPTION_UNAVAILABLE);
-                    break; 
-                }
-                if( !question.marks < 0 ){
-                    return ErrorUtils.APIErrorResponse(req, ERRORS.INCORRECT_MARKS); 
-                    break; 
-                }
-            }
-        }
-    try {      
-        const user = await AdminUser.findById(creatorUserId); 
-        console.log("user", user)
+    try {   
+        const creatorUserId = req.user.id;    
+        const user = await AdminUser.findById({_id : creatorUserId}); 
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
-        // TODO: Validate questions length
-        if(questions.length >10){
-            return ErrorUtils.APIErrorResponse(res, ERRORS.QUESTIONS_LIMIT_EXCEED)
-        }; 
+
         let userId = user.id;
         let userName = user.first_name;
         let userEmail = user.email; 
-        const  newQuiz = new Quiz({
+        const  newQuizData = new Quiz({
             title, 
             description, 
             category,
@@ -77,26 +50,20 @@ QuizController.createQuiz = async (req, res) => {
             creatorUserId: userId, 
             creatorUserName: userName, 
             creatorUserEmail: userEmail,
-            isPublic,
-            sharedEmail,
-            totalTime,
-            status, 
-            questions
+            scope,
+            sharedEmails,
+            timeOut
         })
         if (isDraft) {
             newQuizData.status = 'Draft';
-            newQuizData.isDraft = true;
         }
-        
-        await newQuiz.save(); 
-        
+        await newQuizData.save(); 
         var payload = {
             quiz: {
-                data: newQuiz, 
-                message: "Quiz create sucessfully"
+                data: newQuizData, 
+                message: "Quiz meta data added sucessfully"
             }
         }
-        console.log("quiz::=>", newQuiz); 
         res.status(200).json({
             payload
         });
@@ -105,6 +72,47 @@ QuizController.createQuiz = async (req, res) => {
         return ErrorUtils.APIErrorResponse(res);
     }    
 };
+// TODO: Controller to add questions 
+QuizController.addQuestionsToQuiz = async(req, res) => {
+    
+    const {quizId} = req.params; 
+    const {questions} = req.body;    
+    if( !questions || !Array.isArray(questions) || questions.length < 3 ){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.LESS_NO_OF_QUESTIONS); 
+    }
+    else
+    {
+        let validQuestions = true;
+        for (const question of questions) {
+            if (!question.text || !question.options || !Array.isArray(question.options) || question.options.length !== 4) {
+                validQuestions = false;
+                break;
+            }
+        }
+        if (!validQuestions) {
+            return ErrorUtils.APIErrorResponse(res, ERRORS.WRONG_QUESTION);
+        }
+    }
+    try {
+        const quiz = await Quiz.findById(quizId); 
+        if (!quiz) {
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND); 
+        }
+        if(quiz.status !=='Draft'){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.QUIZ_STATUS_IN_NOT_DRAFT)
+        } 
+        quiz.questions.push(...questions); 
+        //Update the quiz status to Published
+        quiz.status = 'Published';
+        await quiz.save(); 
+        res.status(201).json({
+            message: "Questions added to quiz"
+        })
+    } catch (error) {
+        console.log(error)
+    }
+
+}
 
 QuizController.updateQuiz = async (req, res) => {
     try {

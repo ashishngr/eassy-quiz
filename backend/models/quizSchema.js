@@ -13,13 +13,9 @@ const QuestionSchema = new mongoose.Schema({
         required: true, 
     }, 
     correctOptionIndex: {
-        type: Number, 
-        required: true, 
+        type: Number, //Correct option index always be three.  
+        default: 3, 
     }, 
-    marks: {
-        type: Number, 
-        required: true
-    }
 }); 
 
 const QuizSchema = new mongoose.Schema({
@@ -66,10 +62,10 @@ const QuizSchema = new mongoose.Schema({
     scope: {
         type: String,
         required: true, 
-        enum: ['Public', 'Private'],
+        enum: ['Public', 'Private', 'IsShared'],
         index: true  // Add index for efficient public/private filtering
     },
-    sharedEmail: {
+    sharedEmails: {
         type: [String], 
         optional: true, 
     },
@@ -79,13 +75,13 @@ const QuizSchema = new mongoose.Schema({
         default: 'Published',
         enum: ['Published', 'Draft', 'Deleted'], // Allowed status values
     },
-    totalTime: {
+    timeOut: {
         type: Number, 
         required: true, 
     },
     questions: {
         type: [QuestionSchema], 
-        required: true
+        required: false 
     },
     isDraft: {
         type: Boolean,
@@ -107,7 +103,6 @@ const QuizSchema = new mongoose.Schema({
     }, 
 }
 ); 
-
 
 const Quiz = mongoose.model('Quiz', QuizSchema)
 module.exports = {
