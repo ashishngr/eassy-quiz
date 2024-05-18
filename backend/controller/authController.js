@@ -37,9 +37,8 @@ AuthController.signup = async(req, res) => {
         })
         await adminUser.save(); 
         const payload = {
-            adminUser: {
-                id: adminUser.id, 
-                role: adminUser.role
+            user: {
+                id: adminUser.id
             }
         };
          // TODO: Assign a JWT token 
@@ -71,8 +70,7 @@ AuthController.signin = async(req, res) => {
         console.log("password match"); 
         const payload = {
             user: {
-                id: admin.id, 
-                role: "Admin User"
+                id: admin._id
             }
         }
         const accessToken = AdminAuthHelper.createJWTToken(payload); 

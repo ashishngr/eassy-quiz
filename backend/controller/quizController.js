@@ -33,7 +33,7 @@ QuizController.createQuizMetaData = async (req, res) => {
             return ErrorUtils.APIErrorResponse(res, ERRORS.TOTAL_TIME); 
         }
     try {   
-        const creatorUserId = req.user.id;    
+        const creatorUserId = req.user.id;   
         const user = await AdminUser.findById({_id : creatorUserId}); 
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
@@ -60,10 +60,8 @@ QuizController.createQuizMetaData = async (req, res) => {
         }
         await newQuizData.save(); 
         var payload = {
-            quiz: {
                 data: newQuizData, 
                 message: "Quiz meta data added sucessfully"
-            }
         }
         res.status(200).json({
             payload
