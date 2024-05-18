@@ -13,7 +13,7 @@ StorageUtils.getUserProfile = () => {
         return JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_PROFILE))
     } catch (error) {
         return null; 
-    }
+    }   
 }
 StorageUtils.setUserProfile = (user) => {
     if(user){

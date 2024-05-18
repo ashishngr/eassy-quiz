@@ -8,21 +8,27 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import QuizIntroForm from './QuizIntroForm';
 import QuestionForm from './QuestionForm';
+import StorageUtils from "../utils/storage_utils";
+import API from '../common/apis';
 
 const steps = ['Quiz Details', 'Question and Annswer'];
+
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set()); 
-  const [questions, setQuestions] = useState([{ questionText: '', options: ['', '', ''], correctOption: '' }]);
+  const [questions, setQuestions] = useState([{ questionText: '', options: ['', '', '']}]);
+  const [quizId, setQuizId] = useState();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: '',
-    shared_email: '',
     difficulty: '',
+    timeOut: '',
+    sharedEmails: '',
+    isDraft : "isDraft", 
     scope: '',
-    total_time: ''
+
   });
 
   const handleInputChange = (index, field, value) => {
@@ -62,19 +68,37 @@ export default function HorizontalLinearStepper() {
   }
 
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
+    const token = StorageUtils.getAPIToken();
+
+    console.log("----", token); 
+
     if(activeStep === 0){
-      console.log("form data", formData) 
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      try {
+        console.log("Quiz Intro form data", formData) 
+        const response = await API.createQuixMetaData(formData)
+        console.log("response : ",response.data.payload.data.id)
+        if(response.status === 200 ){
+          const quizId = response.data.payload.data.id; 
+          setQuizId(quizId); 
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        }else {
+          // Handle unexpected status codes
+          console.error("Failed to create quiz metadata:", response);
+          alert("Failed to create quiz metadata. Please try again.");
+      }
+      } catch (error) {
+        console.log(error)
+      }
+     
     }
   };
   const isSaveDisabled = questions.length < 3; 
 
   const handleSaveQuiz = () => {
     // Combine intro data and questions data and save the quiz
-    const quizData = { questions: questions };
-    console.log('Quiz Data:', quizData); // Log the quiz data to console
+     // Log the quiz data to console
   };
   
   return (
