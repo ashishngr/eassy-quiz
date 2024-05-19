@@ -38,7 +38,15 @@ const API = {
       let newToken = StorageUtils.getAPIToken();
       console.log("token--->", newToken )
       const queryParams = params ? new URLSearchParams(params).toString() : "";
-      return axios.get(`${API_BASE_URL}/api/v1/quiz?${queryParams}`, getHeadersWithToken() )
+      return  axios.get(`${API_BASE_URL}/api/v1/quiz?${queryParams}`, getHeadersWithToken() )
+    }, 
+    addQuestions :  (payload, quizId) =>{
+      // const quizId = payload.quizId; 
+      const data = payload; 
+      console.log("Payload in API", payload)
+
+      // const queryParams = quizId ? new URLSearchParams(quizId).toString() : "";
+      return  axios.patch(`${API_BASE_URL}/api/v1/quiz/${quizId}/questions`, data, getHeadersWithToken());
     }
   };
 export default API; 

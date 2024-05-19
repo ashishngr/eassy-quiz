@@ -17,7 +17,7 @@ const steps = ['Quiz Details', 'Question and Annswer'];
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set()); 
-  const [questions, setQuestions] = useState([{ questionText: '', options: ['', '', '']}]);
+  const [questions, setQuestions] = useState([{ text: '', options: ['', '', '', '']}]);
   const [quizId, setQuizId] = useState();
   const [formData, setFormData] = useState({
     title: '',
@@ -43,7 +43,7 @@ export default function HorizontalLinearStepper() {
   };
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, { questionText: '', options: ['', '', ''], correctOption: '' }]);
+    setQuestions([...questions, { text:'', options: ['', '', '', '']}]);
   };
 
   const handleDeleteQuestion = (index) => {
@@ -70,18 +70,17 @@ export default function HorizontalLinearStepper() {
 
   const handleNext = async (e) => {
     e.preventDefault();
-    const token = StorageUtils.getAPIToken();
-
-    console.log("----", token); 
-
     if(activeStep === 0){
       try {
         console.log("Quiz Intro form data", formData) 
         const response = await API.createQuixMetaData(formData)
-        console.log("response : ",response.data.payload.data.id)
+        console.log("response : ",response.data.payload.data._id)
         if(response.status === 200 ){
-          const quizId = response.data.payload.data.id; 
-          setQuizId(quizId); 
+          const Id = response.data.payload.data._id;
+          console.log("---->",response.data.payload.data._id) 
+
+          setQuizId(Id);
+
           setActiveStep((prevActiveStep) => prevActiveStep + 1);
         }else {
           // Handle unexpected status codes
@@ -96,7 +95,15 @@ export default function HorizontalLinearStepper() {
   };
   const isSaveDisabled = questions.length < 3; 
 
-  const handleSaveQuiz = () => {
+  const handleSaveQuiz = async () => {
+    const payload = {
+      questions: questions
+  };
+    console.log("Questions--------------", questions)
+    console.log("--Quiz--Id", quizId) 
+    const questionsData = payload.questions
+    const response = await API.addQuestions(payload, quizId)
+    
     // Combine intro data and questions data and save the quiz
      // Log the quiz data to console
   };
@@ -119,7 +126,7 @@ export default function HorizontalLinearStepper() {
         <React.Fragment>
         <Typography sx={{ mt: 2, mb: 1 }}>
           <div className='flex flex-row-reverse gap-4 items-center p-10 justify-content-flex-end'> 
-            <Button variant="contained" size="medium" disabled={isSaveDisabled}>
+            <Button variant="contained" size="medium" disabled={isSaveDisabled}  onClick={handleSaveQuiz}>
                 Save
             </Button>
             <Button variant="contained" size="medium"  onClick={handleAddQuestion}>
