@@ -75,7 +75,7 @@ QuizController.createQuizMetaData = async (req, res) => {
 QuizController.addQuestionsToQuiz = async(req, res) => {
     
     const {quizId} = req.params; 
-    const {questions} = req.body;    
+    const {questions} = req.body;  
     if( !questions || !Array.isArray(questions) || questions.length < 3 ){
         return ErrorUtils.APIErrorResponse(res, ERRORS.LESS_NO_OF_QUESTIONS); 
     }
