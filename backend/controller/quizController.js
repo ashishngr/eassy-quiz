@@ -199,6 +199,9 @@ QuizController.getAllQuiz = async(req, res) =>  {
                 $match : query
             }, 
             {
+                $sort : { created_at: -1 }
+            },
+            {
                 $skip: skip
             }, 
             {
