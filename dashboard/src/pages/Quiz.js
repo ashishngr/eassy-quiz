@@ -62,6 +62,7 @@ const Quiz = () => {
     const [quizzes, setQuizzes] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalQuizzes, setTotalQuizzes] = useState(0);
     
 
     
@@ -93,9 +94,11 @@ const Quiz = () => {
     const fetchQuizzes = (currentPage, rowsPerPage) => {
       API.getAllQuizes({ page: currentPage, limit: rowsPerPage })
           .then((response) => {
-            let myNewData = response?.data?.data ?? []; 
+            console.log("response", response)
+            let myNewData = response.data.data || []; 
             console.log("MyNewData", myNewData)
             setQuizzes(myNewData || []);
+            setTotalQuizzes(response.data.totalQuiz || 0);
           })              
           .catch((error) => {
               console.error("Error fetching quizzes:", error);
@@ -104,19 +107,19 @@ const Quiz = () => {
 
     
     useEffect(()=>{
-      fetchQuizzes(page + 1, rowsPerPage);
-      console.log("Quizzes", quizzes) 
-
+      fetchQuizzes( page + 1 , rowsPerPage );
+      console.log("total Quizzes par row :", quizzes) 
     },[page, rowsPerPage])
 
     const createQuiz = (event) =>{
         event.preventDefault(); 
         console.log("Go to create quiz page")
         navigate('/admin/dashboard/quiz/create')
-
     }
 
     const handlePageChange = (event, newPage) => {
+      event.preventDefault();
+      console.log("new page", newPage)
       setPage(newPage);
   };
   const handleRowsPerPageChange = (event) => {
@@ -134,9 +137,9 @@ const renderCellContent = (columnId, value) => {
   return (
     <div classNameName='flex flex-col p-10 '>
         {/* Create quiz button */}
-        <div className='absolute top-14 right-10 flex items-center'>
+        <div className='absolute top-18 right-10 flex items-center'>
             <Button variant="contained" size="large" onClick={(event)=>createQuiz(event)}>
-                <span className='mr-2 '><IoCreate /></span> CREATE QUIZ
+                <span className='mr-2 '><IoCreate /></span> ADD QUIZ
             </Button>
         </div>
         {/* Table for quizzes */}
@@ -159,11 +162,8 @@ const renderCellContent = (columnId, value) => {
           </TableHead>
           <TableBody>
             
-            {quizzes
-              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((quiz) => {
-
-                console.log("quiz::->", quiz)
+            {quizzes.map((quiz) => {
+                console.log("single quiz->", quiz)
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={quiz._id}>
                     {columns.map((column) => {
@@ -188,7 +188,7 @@ const renderCellContent = (columnId, value) => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={quizzes.length}
+        count={totalQuizzes}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handlePageChange}
