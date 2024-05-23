@@ -160,7 +160,7 @@ const renderCellContent = (columnId, value) => {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody >
             
             {quizzes.map((quiz) => {
                 console.log("single quiz->", quiz)
@@ -171,7 +171,7 @@ const renderCellContent = (columnId, value) => {
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.id === 'action' ? (
-                            <Button variant="contained" onClick={() => navigate(`/admin/dashboard/quiz`)}>Edit</Button>
+                            <Button variant="contained" onClick={() => navigate(`/admin/dashboard/quiz/update`)}>Edit</Button>
                             ) : (
                               renderCellContent(column.id, value)
                             )
