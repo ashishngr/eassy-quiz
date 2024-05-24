@@ -43,7 +43,7 @@ function AdminRoutesWrapper  () {
                     }
                 />
                 <Route 
-                    path="quiz/update"
+                    path="quiz/:id"
                     element={
                         <RequireAuth>
                             <UpdateQuiz/>

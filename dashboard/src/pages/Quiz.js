@@ -171,7 +171,7 @@ const renderCellContent = (columnId, value) => {
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.id === 'action' ? (
-                            <Button variant="contained" onClick={() => navigate(`/admin/dashboard/quiz/update`)}>Edit</Button>
+                            <Button variant="contained" onClick={() => navigate(`/admin/dashboard/quiz/${quiz._id}`)}>Edit</Button>
                             ) : (
                               renderCellContent(column.id, value)
                             )
