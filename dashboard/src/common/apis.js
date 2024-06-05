@@ -44,9 +44,10 @@ const API = {
       // const quizId = payload.quizId; 
       const data = payload; 
       console.log("Payload in API", payload)
-
-      // const queryParams = quizId ? new URLSearchParams(quizId).toString() : "";
       return  axios.patch(`${API_BASE_URL}/api/v1/quiz/${quizId}/questions`, data, getHeadersWithToken());
+    }, 
+    getSingleQuiz : (id) =>{
+      return  axios.get(`${API_BASE_URL}/api/v1/quiz/${id}`, getHeadersWithToken()); 
     }
   };
 export default API; 
