@@ -1,13 +1,14 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography } from '@mui/material';
 
+
 const SavedQuizzesTable = ({ quizzes }) => {
   return (
     <div>
       <Typography variant="h5" component="h2" gutterBottom >
        My Library
       </Typography>   
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
       <Table sx={{ minWidth: 450 }} aria-label="saved quizzes table">
         <TableHead>
           <TableRow>

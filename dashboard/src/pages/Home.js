@@ -1,10 +1,11 @@
 import React from 'react'
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import HomePageQuizCard from '../components/HomePageQuizCard'; 
 import PublicQuizTable from '../components/PublicQuizTable';
-import SavedQuizzesTable from '../components/SavedQuizzesTable';
+import SavedQuizzesTable from '../components/SavedQuizzesTable'; 
+import LatesQuizTable from '../components/LatesQuizTable';
 
 const Home = () => {
   const quizzes = [
@@ -13,6 +14,11 @@ const Home = () => {
     { id: 3, title: 'History Quiz', creator: 'Michael Johnson' },
     { id: 4, title: 'Geography Quiz', creator: 'Emily Davis' },
     { id: 5, title: 'Literature Quiz', creator: 'Robert Brown' },
+    { id: 6, title: 'Math Quiz', creator: 'John Doe' },
+    { id: 7, title: 'Science Quiz', creator: 'Jane Smith' },
+    { id: 8, title: 'History Quiz', creator: 'Michael Johnson' },
+    { id: 9, title: 'Geography Quiz', creator: 'Emily Davis' },
+    { id: 10, title: 'Literature Quiz', creator: 'Robert Brown' },
   ];
   return (
     <div>
@@ -59,6 +65,12 @@ const Home = () => {
       <div className='flex flex-row mt-12 space-x-8'> 
         <PublicQuizTable />
         <SavedQuizzesTable quizzes={quizzes}/>
+      </div>
+      <div>
+        <Typography variant="h5" component="h2" gutterBottom >
+            Top 10 latest quiz
+        </Typography>
+        <LatesQuizTable />
       </div>
     </div>
   )
