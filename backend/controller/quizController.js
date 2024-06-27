@@ -8,6 +8,7 @@ const {ERRORS} = require("../constants");
 const ErrorUtils = require("../utils/errorUtils"); 
 const EmailUtils = require("../utils/emailUtils"); 
 const { Admin } = require('mongodb');
+const { use } = require('../routes/quizRoutes');
 
 const QuizController = module.exports; 
 
@@ -233,7 +234,7 @@ QuizController.singleQuiz = async(req, res) => {
         }
         const quiz = await Quiz.findById(id); 
         if(!quiz){
-            return EmailUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
         }
         const payload = {
             message: "Quiz find successfully",
@@ -270,6 +271,7 @@ QuizController.deleteQuiz = async(req, res) =>{
 //TODO: API to add quizzes into library 
 QuizController.addQuizzesToLibrary = async(req, res) => {
     const creatorId = req.user.id; 
+    console.log("user id: ", creatorId); 
     const quizId = req.body.quizId;
     const creatorUser = await AdminUser.find({_id: creatorId}); 
     if(!creatorUser){
@@ -293,7 +295,39 @@ QuizController.addQuizzesToLibrary = async(req, res) => {
         return ErrorUtils.APIErrorResponse(res);
     }
 }
-//TODO: API to get quiizes saved in your library
+//TODO: API to get quiizes saved in your library 
+QuizController.getSaveQuizes = async(req, res) =>{
+    const userId = req.user.id; 
+    console.log("user id", userId); 
+    const user = await AdminUser.findById({_id: userId});
+    if(!user){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+
+    const quizzes = await Quiz.find({ savedBy: userId }).exec();
+
+    if (!quizzes) {
+      return res.status(404).json({ error: 'No quizzes found for the user' });
+    }
+
+    res.json(quizzes);
+
+    // const user = AdminUser.findById({_id: userId}); 
+    // if(!user){
+    //     return  ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    // }
+    // try {
+    //     const quizzes = await Quiz.findById({ savedBy: userId })
+    //     if (!quizzes || quizzes.length === 0) {
+    //         return res.status(404).json({ message: 'No saved quizzes found' });
+    //     }
+    //     res.status(200).json(quizzes);
+    // } catch (error) {
+    //     console.log(error); 
+    //     return ErrorUtils.APIErrorResponse(res);
+    // }
+
+}
 //TODO : API to get most popular public quizzes 
 //TODO : API to get latest 10 quizzes of yourself 
 //TODO : API to get stats for the home page 
