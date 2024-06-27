@@ -231,10 +231,9 @@ QuizController.singleQuiz = async(req, res) => {
         if(!creatorUser){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }
-
         const quiz = await Quiz.findById(id); 
         if(!quiz){
-            return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
+            return EmailUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
         }
         const payload = {
             message: "Quiz find successfully",
@@ -267,3 +266,35 @@ QuizController.deleteQuiz = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res);
     }
 }
+
+//TODO: API to add quizzes into library 
+QuizController.addQuizzesToLibrary = async(req, res) => {
+    const creatorId = req.user.id; 
+    const quizId = req.body.quizId;
+    const creatorUser = await AdminUser.find({_id: creatorId}); 
+    if(!creatorUser){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+    try {
+        const quiz = await Quiz.findById(quizId); 
+        if(!quiz){
+            return EmailUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+        }
+        //Check if quiz already saved by user 
+        if (quiz.savedBy.includes(creatorId)) {
+            return res.status(400).json({ message: 'Quiz already saved' });
+        }; 
+        // Add user ID to the savedBy array
+        quiz.savedBy.push(creatorId);
+        await quiz.save();
+        res.status(200).json({ message: 'Quiz saved successfully' });
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
+//TODO: API to get quiizes saved in your library
+//TODO : API to get most popular public quizzes 
+//TODO : API to get latest 10 quizzes of yourself 
+//TODO : API to get stats for the home page 
+

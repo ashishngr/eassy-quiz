@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const {Quiz} = require('../models/quizSchema'); 
 require('dotenv').config(); 
-
-// Connect to your MongoDB database
-// const uri = "mongodb+srv://eassyQuiz:admin@cluster0.r0httbt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0 "; 
-// mongoose.set("strictQuery", false)
-
 mongoose.connect("mongodb+srv://eassyQuiz:admin@cluster0.r0httbt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB to run script'))
   .catch(err => console.error('Error connecting to MongoDB in script:', err));

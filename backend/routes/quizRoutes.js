@@ -13,6 +13,7 @@ router.patch("/quiz/:quizId/questions", validateToken, QuizController.addQuestio
 router.put("/quiz/:id", validateToken, QuizController.updateQuiz);
 router.get("/quiz/:id", validateToken, QuizController.singleQuiz); 
 router.delete("/quiz/:id", validateToken, QuizController.deleteQuiz); 
+router.post("/save", validateToken, QuizController.addQuizzesToLibrary); 
 
 
 
