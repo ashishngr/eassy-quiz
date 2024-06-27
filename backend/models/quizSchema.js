@@ -93,7 +93,17 @@ const QuizSchema = new mongoose.Schema({
           const date = new Date(this.createdAt);
           return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         },
-    },  
+    }, 
+    participants: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'AdminUser', // Assuming a separate User model
+        default: []
+    },
+    savedBy: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'AdminUser', // Assuming a separate User model
+        default: []
+    } 
 },
 {
     collection: "Quiz", 
