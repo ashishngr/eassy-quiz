@@ -367,6 +367,43 @@ QuizController.latestTenQuizes = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res);
     }
 }
-//TODO : API to get stats for the home page  
+//TODO : API to get quiz stats for the home page   
+QuizController.quizStats = async(req, res) => {
+    const userId = req.userId; 
+    try {
+        // 1. Number of total quizzes created by the user
+        const totalQuizzesCreated = await Quiz.countDocuments({ creatorUserId: userId });
 
+        // 2. Number of quizzes the user participated in
+        const quizzesParticipated = await Quiz.countDocuments({ participants: userId });
+
+        // 3. Number of unique users who participated in quizzes created by the user
+        const aggregationPipeline = [
+            // Match quizzes created by the user
+            { $match: { creatorUserId: mongoose.Types.ObjectId(userId) } },
+            // Unwind participants array to have each participant in a separate document
+            { $unwind: '$participants' },
+            // Group by participant to count unique participants
+            { $group: { _id: '$participants' } },
+            // Count distinct participants
+            { $count: 'numUniqueParticipants' }
+        ];
+
+        const result = await Quiz.aggregate(aggregationPipeline);
+
+        let numUniqueParticipants = 0;
+        if (result.length > 0) {
+            numUniqueParticipants = result[0].numUniqueParticipants;
+        }
+
+        res.status(200).json({
+            totalQuizzesCreated,
+            quizzesParticipated,
+            numUniqueParticipants,
+        });
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
 
