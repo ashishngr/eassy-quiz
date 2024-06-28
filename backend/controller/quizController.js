@@ -323,7 +323,32 @@ QuizController.getSaveQuizes = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res);
     }
 }
-//TODO : API to get most popular public quizzes 
+//TODO : API to get most popular public quizzes  
+QuizController.getPublicQuizzes = async(req, res) =>{
+    const userId = req.user.id; 
+    console.log("user id", userId)
+    const user = await AdminUser.findById({_id: userId});
+    console.log("user - ",user)
+    if(!user){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+    try {
+        const PublicQuizzes = await Quiz.find({ scope: 'Public' }); 
+        if(!PublicQuizzes){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_PUBLIC_QUIZZ); 
+        }
+        // Shuffle the quizzes 
+        const shuffledQuizzes = PublicQuizzes.sort(() => 0.5 - Math.random()); 
+        const topTenQuizzes = shuffledQuizzes.slice(0, 10); 
+        res.status(200).json({
+            data: topTenQuizzes
+        })
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
 //TODO : API to get latest 10 quizzes of yourself 
+
 //TODO : API to get stats for the home page 
 

@@ -70,5 +70,9 @@ exports.ERRORS = {
     QUIZ_ALREADY_SAVED : {
         status_code: 400, 
         message: "Quiz is already saved by you"
+    }, 
+    NO_PUBLIC_QUIZZ : {
+        status_code: 404, 
+        message: 'No public quizzes found'
     }
 }

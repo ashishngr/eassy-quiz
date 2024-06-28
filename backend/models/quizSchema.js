@@ -63,6 +63,7 @@ const QuizSchema = new mongoose.Schema({
         type: String,
         required: true, 
         enum: ['Public', 'Private', 'IsShared'],
+        default : 'Private',
         index: true  // Add index for efficient public/private filtering
     },
     sharedEmails: {
