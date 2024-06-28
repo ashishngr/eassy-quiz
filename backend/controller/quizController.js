@@ -280,16 +280,22 @@ QuizController.addQuizzesToLibrary = async(req, res) => {
     try {
         const quiz = await Quiz.findById(quizId); 
         if(!quiz){
-            return EmailUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+        }; 
+        // Check if quiz is created by same user 
+        if(quiz.creatorUserId.toString() !== creatorId){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NOT_AUTHORIZED_TO_SAVE_QUIZ);
         }
         //Check if quiz already saved by user 
         if (quiz.savedBy.includes(creatorId)) {
-            return res.status(400).json({ message: 'Quiz already saved' });
+            return ErrorUtils.APIErrorResponse(res, ERRORS.QUIZ_ALREADY_SAVED);
         }; 
         // Add user ID to the savedBy array
         quiz.savedBy.push(creatorId);
         await quiz.save();
+
         res.status(200).json({ message: 'Quiz saved successfully' });
+
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
@@ -303,30 +309,19 @@ QuizController.getSaveQuizes = async(req, res) =>{
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }
-
-    const quizzes = await Quiz.find({ savedBy: userId }).exec();
-
-    if (!quizzes) {
-      return res.status(404).json({ error: 'No quizzes found for the user' });
+    try {
+    const quizzes = await Quiz.find({ savedBy: { $in: [new mongoose.Types.ObjectId(userId)] } }).exec();
+    if (!quizzes ||  quizzes.length === 0) {
+      return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND); 
     }
+    res.status(200).json({
+        data : quizzes
+    });
 
-    res.json(quizzes);
-
-    // const user = AdminUser.findById({_id: userId}); 
-    // if(!user){
-    //     return  ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
-    // }
-    // try {
-    //     const quizzes = await Quiz.findById({ savedBy: userId })
-    //     if (!quizzes || quizzes.length === 0) {
-    //         return res.status(404).json({ message: 'No saved quizzes found' });
-    //     }
-    //     res.status(200).json(quizzes);
-    // } catch (error) {
-    //     console.log(error); 
-    //     return ErrorUtils.APIErrorResponse(res);
-    // }
-
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
 }
 //TODO : API to get most popular public quizzes 
 //TODO : API to get latest 10 quizzes of yourself 

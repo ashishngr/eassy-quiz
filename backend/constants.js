@@ -62,5 +62,13 @@ exports.ERRORS = {
     QUIZ_STATUS_IN_NOT_DRAFT : {
         status_code: 400, 
         message: 'Quiz status is not draft'
+    }, 
+    NOT_AUTHORIZED_TO_SAVE_QUIZ : {
+        status_code : 403, 
+        message : 'You are not authorized to save this quiz'
+    }, 
+    QUIZ_ALREADY_SAVED : {
+        status_code: 400, 
+        message: "Quiz is already saved by you"
     }
 }
