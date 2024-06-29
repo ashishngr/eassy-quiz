@@ -57,6 +57,6 @@ const API = {
     },
     updatePassword : (payload) =>{
       return axios.put(`${API_BASE_URL}/api/v1/updatePassword` , payload, getHeadersWithToken());
-    }
+    },
   };
 export default API; 

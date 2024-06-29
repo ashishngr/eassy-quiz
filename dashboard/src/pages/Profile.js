@@ -5,6 +5,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import axios from 'axios';
 import API from '../common/apis'; 
 
 
@@ -17,9 +18,24 @@ const Profile = () => {
     newPassword: '',
     confirmNewPassword: '', 
     profilePic: null, 
-  });  
-  const [showError, setShowError] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+    profilePicUrl: '',
+  });   
+
+  // const [image, setImage] = useState(null);
+  const [buttonText, setButtonText] = useState('Upload Profile');
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // setImage(URL.createObjectURL(file));
+      setProfile({
+        ...profile,
+        profilePic: file,
+        profilePicUrl: URL.createObjectURL(file)
+      });
+      setButtonText('Save Picture');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,6 +44,15 @@ const Profile = () => {
       [name]: value
     });
   }; 
+
+  const handleProfilePicUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(URL.createObjectURL(file));
+      setButtonText('Save Picture');
+    }
+  };
+
 
   useEffect(()=>{
     fetchUserProfileData()
@@ -104,6 +129,16 @@ const Profile = () => {
 
   return (
     <Container maxWidth="lg">
+      <ToastContainer 
+      autoClose={5000} 
+      hideProgressBar={false} 
+      newestOnTop={false} 
+      closeOnClick 
+      rtl={false} 
+      pauseOnFocusLoss 
+      draggable 
+      pauseOnHover 
+      />
      <Box
         component="form"
         onSubmit={handleSubmit}
@@ -121,20 +156,22 @@ const Profile = () => {
           <Grid item xs={12} sm={2}>
             <Avatar
               alt="Profile Picture"
-              src={profile.profilePic ? URL.createObjectURL(profile.profilePic) : ''}
-              sx={{ width: 100, height: 100 }}
-            />
+              src={image}
+              sx={{ width: 100, height: 100, fontSize: 54 }}
+            >
+              {!image && profile.firstName.charAt(0)}
+            </Avatar>
             <input
               type="file"
               accept="image/*"
               name="profilePic"
-              onChange={handleChange}
+              onChange={handleImageChange}
               style={{ display: 'none' }}
-              id="profilePicInput"
+               id="profile-pic-input"
             />
-            <label htmlFor="profilePicInput">
-              <Button variant="outlined" component="span" sx={{ padding: '4px 8px', fontSize: '0.875rem', mt: 2 }}>
-                Update Profile 
+            <label htmlFor="profile-pic-input">
+              <Button variant="outlined" component="span" sx={{ padding: '4px 8px', fontSize: '0.875rem', mt: 2 }} onClick={handleProfilePicUpload}>
+                {buttonText}
               </Button>
             </label>
           </Grid>
