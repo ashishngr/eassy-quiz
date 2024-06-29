@@ -71,25 +71,6 @@ const Quiz = () => {
 
     const navigate = useNavigate();  
 
-    // useEffect(()=>{
-    //   API.getAllQuizes({
-    //     page: 1, 
-    //     limit: 10
-    //   })
-    //   .then((response)=>{
-    //     console.log("response", response.data.data)
-
-    //     const { quiz }  = response.data.data; 
-    //     console.log("Quiz:", quiz)
-
-    //     setQuizzes( quiz || []); 
-
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching quizzes:", error);
-    //   });
-      
-    // },[page, rowsPerPage]); 
 
     const fetchQuizzes = (currentPage, rowsPerPage) => {
       API.getAllQuizes({ page: currentPage, limit: rowsPerPage })

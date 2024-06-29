@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TextField, Button, Container, Typography, Box, Grid, Avatar, Divider } from '@mui/material';
+
+import API from '../common/apis'; 
+
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -10,14 +13,57 @@ const Profile = () => {
     newPassword: '',
     confirmNewPassword: '', 
     profilePic: null, 
-  });
+  }); 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile({
       ...profile,
       [name]: value
     });
-  };
+  }; 
+
+  useEffect(()=>{
+    fetchUserProfileData()
+  },[])
+
+  const fetchUserProfileData = async () =>{
+    try {
+      let response = await API.getUserProfile(); 
+      let data = response.data.data; 
+      console.log(data); 
+      setProfile({
+        firstName: data.first_name, 
+        lastName : data.last_name, 
+        email : data.email
+      })
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+    }
+  }; 
+
+  const handleProfileChange = async (e) =>{
+      e.preventDefault(); 
+      try {
+        
+        const response = await API.updateUserProfileInfo({
+          first_name : profile.firstName, 
+          last_name: profile.lastName, 
+          email: profile.email
+        }); 
+        const data = await response.data
+        console.log('Profile updated:', data); 
+        // Update the profile state with the new data
+      setProfile((prevState) => ({
+        ...prevState,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        email: data.email,
+      }));
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -98,7 +144,7 @@ const Profile = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  
+                  onClick={handleProfileChange}
                   fullWidth
                 >
                   Update Basic Information

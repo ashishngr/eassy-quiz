@@ -48,6 +48,13 @@ const API = {
     }, 
     getSingleQuiz : (id) =>{
       return  axios.get(`${API_BASE_URL}/api/v1/quiz/${id}`, getHeadersWithToken()); 
+    }, 
+    getUserProfile :  async () =>{
+      return  await axios.get(`${API_BASE_URL}/api/v1/profileInfo`, getHeadersWithToken());
+    }, 
+    updateUserProfileInfo : (payload) =>{
+      console.log("Payload", payload)
+      return axios.put(`${API_BASE_URL}/api/v1/updateProfile`, payload, getHeadersWithToken())
     }
   };
 export default API; 
