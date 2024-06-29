@@ -69,4 +69,20 @@ ProfileController.udateBasicProfile = async(req, res) => {
         return ErrorUtils.APIErrorResponse(res);
     }
 
+}; 
+ProfileController.getUserProfile = async(req, res) =>{
+    const userId = req.user.id; 
+    try {
+        const user = await AdminUser.findById( userId, 'first_name last_name email'); 
+        if(!user){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND);
+        }; 
+        return res.status(200).json({
+            message: "User find succesfully", 
+            data : user
+        })
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
 }

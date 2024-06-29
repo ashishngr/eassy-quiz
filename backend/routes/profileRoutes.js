@@ -9,6 +9,7 @@ let validateToken = AdminAuthHelper.validateToken;
  
 router.put("/updatePassword", validateToken, ProfileController.updatePassword); 
 router.put("/updateProfile", validateToken, ProfileController.udateBasicProfile); 
+router.get("/profileInfo", validateToken, ProfileController.getUserProfile); 
 
 module.exports = router; 
 
