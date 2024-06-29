@@ -19,7 +19,4 @@ router.get("/public", validateToken, QuizController.getPublicQuizzes);
 router.get("/latesQuiz", validateToken, QuizController.latestTenQuizes); 
 router.get("/stats", validateToken, QuizController.quizStats)
 
-
-
-
-module.exports = router
+module.exports = router; 
