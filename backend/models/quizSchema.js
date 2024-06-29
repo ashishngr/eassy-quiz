@@ -18,6 +18,27 @@ const QuestionSchema = new mongoose.Schema({
     }, 
 }); 
 
+const ParticipationSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AdminUser',
+        required: true,
+        index: true // Indexing for participant queries
+    },
+    score: {
+        type: Number,
+        required: true,
+    },
+    completed: {
+        type: Boolean,
+        required: true,
+    },
+    date: {
+        type: Date,
+        default: Date.now,
+    },
+})
+
 const QuizSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -97,14 +118,18 @@ const QuizSchema = new mongoose.Schema({
     }, 
     participants: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'AdminUser', // Assuming a separate User model
-        default: []
+        ref: 'AdminUser',
+        default: [],
     },
     savedBy: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'AdminUser', // Assuming a separate User model
-        default: []
-    } 
+        ref: 'AdminUser',
+        default: [],
+    },
+    participation: {
+        type: [ParticipationSchema],
+        default: [],
+    },
 },
 {
     collection: "Quiz", 
