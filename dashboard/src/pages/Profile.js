@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { TextField, Button, Container, Typography, Box, Grid, Avatar, Divider, IconButton, InputAdornment } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import API from '../common/apis'; 
 
@@ -42,7 +44,8 @@ const Profile = () => {
         email : data.email
       })
     } catch (error) {
-        console.error("Error fetching profile data:", error);
+      console.log("failed to fetch user frofile information", error); 
+      toast.error('Failed to fetch profile data: ');
     }
   }; 
 
@@ -56,7 +59,8 @@ const Profile = () => {
           email: profile.email
         }); 
         const data = await response.data
-        console.log('Profile updated:', data); 
+        toast.success('Profile updated successfully');
+        // console.log('Profile updated:', data); 
         // Update the profile state with the new data
       setProfile((prevState) => ({
         ...prevState,
@@ -66,21 +70,22 @@ const Profile = () => {
       }));
       } catch (error) {
         console.error('Error updating profile:', error);
+        toast.error('Failed to update profile');
       }
   }; 
   const handleUpdatePassword = async(e) =>{
     e.preventDefault(); 
     if (profile.newPassword !== profile.confirmNewPassword) {
       console.error('Passwords do not match');
+      toast.error('New passwords do not match');
       return;
     }
     try {
-      const response = await API.updatePassword({
+      await API.updatePassword({
         currentPassword : profile.oldPassword, 
         newPassword : profile.newPassword
       })
-      const data = response; 
-      console.log("data", data)
+      toast.success('Password updated successfully'); 
     } catch (error) {
       console.error('Error updating password:', error);
     }
@@ -89,7 +94,8 @@ const Profile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission, e.g., send data to a server
-    console.log('Profile submitted:', profile);
+    console.log('Profile submitted:', profile); 
+    toast.error('Failed to update password');
   };
 
   const togglePasswordVisibility = () => {
