@@ -74,5 +74,9 @@ exports.ERRORS = {
     NO_PUBLIC_QUIZZ : {
         status_code: 404, 
         message: 'No public quizzes found'
+    }, 
+    NO_FILE_UPLOADED : {
+        status_code: 400, 
+        message: "No file uploaded"
     }
 }

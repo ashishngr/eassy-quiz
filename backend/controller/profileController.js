@@ -85,4 +85,27 @@ ProfileController.getUserProfile = async(req, res) =>{
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
     }
+}; 
+ProfileController.uploadProfilePicture = async(req, res) =>{
+    const userId = req.user.id; 
+    try {
+        const user = await AdminUser.findById({_id : userId}); 
+        if(!user){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND)
+        }
+        if (!req.file) {
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_FILE_UPLOADED);
+        }
+
+        const fileData = req.file.buffer;
+        const imageUrl = `data:${req.file.mimetype};base64,${fileData.toString('base64')}`;
+
+        user.profilePick = imageUrl;
+        await user.save();
+
+        res.status(200).json({ imageUrl });
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
 }
