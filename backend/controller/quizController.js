@@ -54,7 +54,8 @@ QuizController.createQuizMetaData = async (req, res) => {
             creatorUserEmail: userEmail,
             scope,
             sharedEmails,
-            timeOut
+            timeOut, 
+            participants: []
         })
         if (isDraft) {
             newQuizData.status = 'Draft';
