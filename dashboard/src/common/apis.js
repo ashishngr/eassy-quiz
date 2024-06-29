@@ -53,8 +53,10 @@ const API = {
       return  await axios.get(`${API_BASE_URL}/api/v1/profileInfo`, getHeadersWithToken());
     }, 
     updateUserProfileInfo : (payload) =>{
-      console.log("Payload", payload)
       return axios.put(`${API_BASE_URL}/api/v1/updateProfile`, payload, getHeadersWithToken())
+    },
+    updatePassword : (payload) =>{
+      return axios.put(`${API_BASE_URL}/api/v1/updatePassword` , payload, getHeadersWithToken());
     }
   };
 export default API; 

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { TextField, Button, Container, Typography, Box, Grid, Avatar, Divider } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Grid, Avatar, Divider, IconButton, InputAdornment } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import API from '../common/apis'; 
 
@@ -13,7 +15,9 @@ const Profile = () => {
     newPassword: '',
     confirmNewPassword: '', 
     profilePic: null, 
-  }); 
+  });  
+  const [showError, setShowError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,12 +67,33 @@ const Profile = () => {
       } catch (error) {
         console.error('Error updating profile:', error);
       }
+  }; 
+  const handleUpdatePassword = async(e) =>{
+    e.preventDefault(); 
+    if (profile.newPassword !== profile.confirmNewPassword) {
+      console.error('Passwords do not match');
+      return;
+    }
+    try {
+      const response = await API.updatePassword({
+        currentPassword : profile.oldPassword, 
+        newPassword : profile.newPassword
+      })
+      const data = response; 
+      console.log("data", data)
+    } catch (error) {
+      console.error('Error updating password:', error);
+    }
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission, e.g., send data to a server
     console.log('Profile submitted:', profile);
+  };
+
+  const togglePasswordVisibility = () => {
+    setProfile({ ...profile, showPassword: !profile.showPassword });
   };
 
   return (
@@ -163,8 +188,17 @@ const Profile = () => {
           name="oldPassword"
           value={profile.oldPassword}
           onChange={handleChange}
-          type="password"
+          type={profile.showPassword ? 'text' : 'password'} 
           fullWidth
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={togglePasswordVisibility}>
+                  {profile.showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
         />
         <TextField
           label="New Password"
@@ -172,8 +206,17 @@ const Profile = () => {
           name="newPassword"
           value={profile.newPassword}
           onChange={handleChange}
-          type="password"
+          type={profile.showPassword ? 'text' : 'password'} 
           fullWidth
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={togglePasswordVisibility}>
+                  {profile.showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
         />
         <TextField
           label="Confirm New Password"
@@ -181,10 +224,19 @@ const Profile = () => {
           name="confirmNewPassword"
           value={profile.confirmNewPassword}
           onChange={handleChange}
-          type="password"
-          fullWidth
+          type={profile.showPassword ? 'text' : 'password'} 
+          fullWidth 
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={togglePasswordVisibility}>
+                  {profile.showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
         />
-        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={handleUpdatePassword}>
           Save
         </Button>
       </Box>
