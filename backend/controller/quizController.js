@@ -370,7 +370,7 @@ QuizController.latestTenQuizes = async(req, res) =>{
 }
 //TODO : API to get quiz stats for the home page   
 QuizController.quizStats = async(req, res) => {
-    const userId = req.userId; 
+    const userId = req.user.id; 
     try {
         // 1. Number of total quizzes created by the user
         const totalQuizzesCreated = await Quiz.countDocuments({ creatorUserId: userId });
@@ -381,7 +381,7 @@ QuizController.quizStats = async(req, res) => {
         // 3. Number of unique users who participated in quizzes created by the user
         const aggregationPipeline = [
             // Match quizzes created by the user
-            { $match: { creatorUserId: mongoose.Types.ObjectId(userId) } },
+            { $match: { creatorUserId: new mongoose.Types.ObjectId(userId) } },
             // Unwind participants array to have each participant in a separate document
             { $unwind: '$participants' },
             // Group by participant to count unique participants
