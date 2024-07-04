@@ -339,8 +339,14 @@ QuizController.getPublicQuizzes = async(req, res) =>{
         // Shuffle the quizzes 
         const shuffledQuizzes = PublicQuizzes.sort(() => 0.5 - Math.random()); 
         const topTenQuizzes = shuffledQuizzes.slice(0, 10); 
+        const response = topTenQuizzes.map(quiz => ({
+            title: quiz.title,
+            description: quiz.description,
+            creatorUserName: quiz.creatorUserName,
+            numberOfParticipants: quiz.participants.length
+        })); 
         res.status(200).json({
-            data: topTenQuizzes
+            data: response
         })
     } catch (error) {
         console.log(error); 
