@@ -57,6 +57,9 @@ const API = {
     },
     updatePassword : (payload) =>{
       return axios.put(`${API_BASE_URL}/api/v1/updatePassword` , payload, getHeadersWithToken());
-    },
+    }, 
+    quizStat : async() =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/stats`, getHeadersWithToken())
+    }
   };
 export default API; 

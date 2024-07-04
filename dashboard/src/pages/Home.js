@@ -1,11 +1,13 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import { Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import HomePageQuizCard from '../components/HomePageQuizCard'; 
 import PublicQuizTable from '../components/PublicQuizTable';
 import SavedQuizzesTable from '../components/SavedQuizzesTable'; 
-import LatesQuizTable from '../components/LatesQuizTable';
+import LatesQuizTable from '../components/LatesQuizTable'; 
+
+import API from '../common/apis';
 
 const Home = () => {
   const quizzes = [
@@ -20,21 +22,36 @@ const Home = () => {
     { id: 9, title: 'Geography Quiz', creator: 'Emily Davis' },
     { id: 10, title: 'Literature Quiz', creator: 'Robert Brown' },
   ];
+  const [quizCreated, setQuizCreated ] = useState(0); 
+  const [quizzesParticipated, setQuizzesParticipated] = useState(0); 
+  const [numUniqueParticipants, setNumUniqueParticipants] = useState(0); 
+
+
+  const fetchQuizSatat = async() =>{
+    const response = await API.quizStat();
+    setQuizCreated(response?.data.totalQuizzesCreated); 
+    setNumUniqueParticipants(response?.data.numUniqueParticipants); 
+    setQuizzesParticipated(response?.data.quizzesParticipated)
+    console.log("Quiz Stat", response);
+  }
+  useEffect(()=>{
+    fetchQuizSatat()
+  },[])
   return (
     <div>
       <div className='flex flex-row justify-between'>
         <div className='flex flex-row'>
           <HomePageQuizCard 
         heading={"Total Quizes"}
-        nember={10}
+        nember={quizCreated}
         /> 
         <HomePageQuizCard 
         heading={"Quizzes Participated"}
-        nember={10}
+        nember={quizzesParticipated}
         /> 
         <HomePageQuizCard 
         heading={"Users Participated"}
-        nember={10}
+        nember={numUniqueParticipants}
         /> 
         </div>
         <div>
