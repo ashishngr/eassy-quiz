@@ -60,6 +60,9 @@ const API = {
     }, 
     quizStat : async() =>{
       return await axios.get(`${API_BASE_URL}/api/v1/stats`, getHeadersWithToken())
+    }, 
+    publicQuiz : async() =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/public`, getHeadersWithToken())
     }
   };
 export default API; 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,7 +7,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Typography } from '@mui/material';
+import { Typography, Button } from '@mui/material';
+
+import API from '../common/apis'; 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -17,7 +19,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,
     },
-}));
+})); 
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
@@ -47,11 +49,28 @@ const rows = [
 
 
 
-const PublicQuizTable = () => {
+const PublicQuizTable = () => { 
+
+  const [quizData, setQuizData] = useState([]); 
+
+  const getPublicQuizzes = async() =>{
+    const response = await API.publicQuiz()
+    .then((response)=> {
+      let data = response?.data.data || [] ;
+      setQuizData(data); 
+    }) 
+    .catch((error)=> {
+      console.log("Error in fetching public quizzes", error)
+    })
+    
+  }
+  useEffect(()=>{
+    getPublicQuizzes(); 
+  }, [])
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: 'auto' }}>
         <Typography variant="h5" component="h2" gutterBottom >
-        Saved Quizzes
+          Public Quiz 
       </Typography> 
       <Table sx={{ minWidth: 600 }} aria-label="customized table">
         <TableHead>
@@ -59,20 +78,22 @@ const PublicQuizTable = () => {
             <StyledTableCell>Title</StyledTableCell>
             <StyledTableCell align="right">Description</StyledTableCell>
             <StyledTableCell align="right">Creator</StyledTableCell>
-            <StyledTableCell align="right">User Played</StyledTableCell>
-            <StyledTableCell align="right">Actions</StyledTableCell>
+            <StyledTableCell align="right">Participants</StyledTableCell>
+            <StyledTableCell align="right">Action</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
+          {quizData.map((quiz, index) => (
+            <StyledTableRow key={quiz.index}>
               <StyledTableCell component="th" scope="row">
-                {row.name}
+                {quiz.title}
               </StyledTableCell>
-              <StyledTableCell align="right">{row.calories}</StyledTableCell>
-              <StyledTableCell align="right">{row.fat}</StyledTableCell>
-              <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-              <StyledTableCell align="right">{row.protein}</StyledTableCell>
+              <StyledTableCell align="right">{quiz.description}</StyledTableCell>
+              <StyledTableCell align="right">{quiz.creatorUserName}</StyledTableCell>
+              <StyledTableCell align="right">{quiz.numberOfParticipants}</StyledTableCell>
+              <StyledTableCell align="right">
+              <Button variant="outlined" color="primary" >Play</Button>
+              </StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
