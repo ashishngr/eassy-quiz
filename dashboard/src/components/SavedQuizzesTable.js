@@ -1,8 +1,21 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography } from '@mui/material';
 
+import API from '../common/apis';
 
-const SavedQuizzesTable = ({ quizzes }) => {
+const SavedQuizzesTable = ({ quizzes }) => { 
+  const [quiz, setQuiz] = useState([]); 
+
+  const getSavedQuizzes = async() =>{
+    await API.getSavedQuizzes()
+    .then(response => {
+      let data = response?.data.data || [] ; 
+      console.log("data save", data)
+    })
+  }
+  useEffect(()=>{
+    getSavedQuizzes()
+  },[])
   return (
     <div>
       <Typography variant="h5" component="h2" gutterBottom >
@@ -12,8 +25,8 @@ const SavedQuizzesTable = ({ quizzes }) => {
       <Table sx={{ minWidth: 450 }} aria-label="saved quizzes table">
         <TableHead>
           <TableRow>
-            <TableCell>Title of Quiz</TableCell>
-            <TableCell>Creator of Quiz</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Creator</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>

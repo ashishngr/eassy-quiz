@@ -63,6 +63,12 @@ const API = {
     }, 
     publicQuiz : async() =>{
       return await axios.get(`${API_BASE_URL}/api/v1/public`, getHeadersWithToken())
+    }, 
+    getSavedQuizzes : async() =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/saved`, getHeadersWithToken())
+    },
+    topTenQuiz : async () =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/latesQuiz`, getHeadersWithToken()); 
     }
   };
 export default API; 

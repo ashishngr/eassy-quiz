@@ -54,7 +54,7 @@ const PublicQuizTable = () => {
   const [quizData, setQuizData] = useState([]); 
 
   const getPublicQuizzes = async() =>{
-    const response = await API.publicQuiz()
+    await API.publicQuiz()
     .then((response)=> {
       let data = response?.data.data || [] ;
       setQuizData(data); 
