@@ -313,10 +313,16 @@ QuizController.getSaveQuizes = async(req, res) =>{
     try {
     const quizzes = await Quiz.find({ savedBy: { $in: [new mongoose.Types.ObjectId(userId)] } }).exec();
     if (!quizzes ||  quizzes.length === 0) {
-      return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND); 
-    }
+      return res.status(200).json({
+        message : "You do not have any saved quiz"
+      })
+    } 
+    const response = quizzes.map(quiz => ({
+        title: quiz.title, 
+        creatorUserName: quiz.creatorUserName,
+    }))
     res.status(200).json({
-        data : quizzes
+        data : response
     });
 
     } catch (error) {
@@ -362,12 +368,22 @@ QuizController.latestTenQuizes = async(req, res) =>{
     }
     try {
         const quizzes = await Quiz.find({creatorUserId : userId}).sort({ created_at: -1 })
-        if(!quizzes){
-            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND); 
+        if(!quizzes || quizzes.length == 0){
+            return res.status(200).json({
+                message : "You do not have any saved quiz"
+            }); 
         } 
         const topTenQuiz = quizzes.slice(0, 10); 
+        const data = topTenQuiz.map(quiz => ({
+            title : quiz.title, 
+            description : quiz.description, 
+            creatorUserName: quiz.creatorUserName,
+            scope : quiz.scope, 
+            created_at: quiz.created_at, 
+            participants: quiz.participants.length, 
+        }))
         return res.status(200).json({
-            data: topTenQuiz
+            data: data
         })
     } catch (error) {
         console.log(error); 
