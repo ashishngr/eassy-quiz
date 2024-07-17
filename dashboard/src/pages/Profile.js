@@ -21,7 +21,7 @@ const Profile = () => {
     profilePicUrl: '',
   });   
 
-  // const [image, setImage] = useState(null);
+  const [image, setImage] = useState(null);
   const [buttonText, setButtonText] = useState('Upload Profile');
 
   const handleImageChange = (e) => {
