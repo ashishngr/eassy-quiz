@@ -116,6 +116,7 @@ const QuizSchema = new mongoose.Schema({
           return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
         },
     }, 
+    linkToken : String,
     participants: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'AdminUser',

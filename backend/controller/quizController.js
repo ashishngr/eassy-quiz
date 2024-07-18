@@ -8,7 +8,9 @@ const {ERRORS} = require("../constants");
 const ErrorUtils = require("../utils/errorUtils"); 
 const EmailUtils = require("../utils/emailUtils"); 
 const { Admin } = require('mongodb');
-const { use } = require('../routes/quizRoutes');
+const { use } = require('../routes/quizRoutes'); 
+
+const SecureLinkGenerator = require("../helper/secureLinkHelper"); 
 
 const QuizController = module.exports; 
 
@@ -427,6 +429,27 @@ QuizController.quizStats = async(req, res) => {
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
+    }
+}
+QuizController.generateQuizLink = async(req, res) => {
+    const userId = req.user.id; 
+    const { quizId } = req.params;
+    const user = await AdminUser.findById(userId);
+    if(!user){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+    try {
+        const quiz = await Quiz.findById(quizId);
+        if(!quiz){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+        }
+        const { link, token } = SecureLinkGenerator.generateSecureLink(quizId);
+        quiz.linkToken = token;
+        await quiz.save();
+        res.status(200).json({link})
+    } catch (error) {
+        console.log(error);
+        return ErrorUtils.APIErrorResponse(res); 
     }
 }
 

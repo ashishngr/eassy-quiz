@@ -17,6 +17,7 @@ router.post("/save", validateToken, QuizController.addQuizzesToLibrary);
 router.get("/saved", validateToken, QuizController.getSaveQuizes);
 router.get("/public", validateToken, QuizController.getPublicQuizzes); 
 router.get("/latesQuiz", validateToken, QuizController.latestTenQuizes); 
-router.get("/stats", validateToken, QuizController.quizStats)
+router.get("/stats", validateToken, QuizController.quizStats);
+router.get("/quiz/:quizId/generate-link", validateToken, QuizController.generateQuizLink);
 
 module.exports = router; 
