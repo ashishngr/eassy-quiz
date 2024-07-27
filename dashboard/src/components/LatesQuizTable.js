@@ -64,7 +64,7 @@ const LatesQuizTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {quizzes.map((quiz, index) => (
+          {quizzes?.map((quiz, index) => (
             <TableRow key={quiz.index}>
               <TableCell component="th" scope="row">
                 {quiz.title}

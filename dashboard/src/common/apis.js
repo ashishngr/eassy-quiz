@@ -69,6 +69,9 @@ const API = {
     },
     topTenQuiz : async () =>{
       return await axios.get(`${API_BASE_URL}/api/v1/latesQuiz`, getHeadersWithToken()); 
+    }, 
+    getPrivateQuizLink : async(quizId) =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/privateQiz/${quizId}`, getHeadersWithToken()); 
     }
   };
 export default API; 

@@ -11,6 +11,8 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import {useNavigate} from 'react-router-dom';
 
+import ThreeDotDropdown from '../components/ThreeDotDropdown';
+
 import API from '../common/apis';
 
 const columns = [
@@ -45,6 +47,12 @@ const columns = [
       label: 'Status',
       minWidth: 170,
       align: 'right',
+    },
+    {
+      id: 'edit',
+      label: 'Edit',
+      minWidth: 170,
+      align: 'center',
     },
     {
       id: 'action',
@@ -145,18 +153,22 @@ const renderCellContent = (columnId, value) => {
             
             {quizzes.map((quiz) => {
                 console.log("single quiz->", quiz)
+                console.log("single quiz id->", quiz._id)
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={quiz._id}>
                     {columns.map((column) => {
                       const value = quiz[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.id === 'action' ? (
+                          {column.id === 'edit' ? (
                             <Button variant="contained" onClick={() => navigate(`/admin/dashboard/quiz/${quiz._id}`)}>Edit</Button>
+                            ) : column.id === 'action' ? (
+                              <ThreeDotDropdown quizId={quiz._id}/>
                             ) : (
                               renderCellContent(column.id, value)
                             )
                           }
+                          
                         </TableCell>
                       );
                     })}
