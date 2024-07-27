@@ -1,4 +1,5 @@
 const express = require('express'); 
+const jwt = require('jsonwebtoken'); 
 const {Quiz} = require("../models/quizSchema"); 
 const {AdminUser} = require("../models/adminUserSchema")
 var mongoose = require("mongoose"); 
@@ -431,25 +432,22 @@ QuizController.quizStats = async(req, res) => {
         return ErrorUtils.APIErrorResponse(res);
     }
 }
-QuizController.generateQuizLink = async(req, res) => {
+QuizController.generatePublicQuizLink = async(req, res) => {
     const userId = req.user.id; 
-    const { quizId } = req.params;
-    const user = await AdminUser.findById(userId);
+    const user = await AdminUser.findById({_id: userId});
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }
     try {
-        const quiz = await Quiz.findById(quizId);
-        if(!quiz){
-            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
-        }
-        const { link, token } = SecureLinkGenerator.generateSecureLink(quizId);
-        quiz.linkToken = token;
-        await quiz.save();
-        res.status(200).json({link})
+        const { quizId } = req.params;
+        const quiz = await Quiz.findById(quizId); 
+        if (quiz && quiz.scope === 'Public') {
+            const token = jwt.sign({ quizId }, process.env.SECRET_KEY, { expiresIn: '2h' });
+            res.json({ link: `${process.env.FRONTEND_URL}/play?token=${token}` });
+        }   
     } catch (error) {
-        console.log(error);
-        return ErrorUtils.APIErrorResponse(res); 
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
     }
 }
 

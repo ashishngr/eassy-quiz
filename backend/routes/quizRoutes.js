@@ -18,6 +18,6 @@ router.get("/saved", validateToken, QuizController.getSaveQuizes);
 router.get("/public", validateToken, QuizController.getPublicQuizzes); 
 router.get("/latesQuiz", validateToken, QuizController.latestTenQuizes); 
 router.get("/stats", validateToken, QuizController.quizStats);
-router.get("/quiz/:quizId/generate-link", validateToken, QuizController.generateQuizLink);
+router.get("/:quizId", validateToken, QuizController.generatePublicQuizLink); 
 
 module.exports = router; 
