@@ -78,5 +78,9 @@ exports.ERRORS = {
     NO_FILE_UPLOADED : {
         status_code: 400, 
         message: "No file uploaded"
+    }, 
+    ACCESS_DENIED : {
+        status_code: 403, 
+        message: "Access Denied"
     }
 }

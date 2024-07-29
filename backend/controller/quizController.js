@@ -10,6 +10,7 @@ const ErrorUtils = require("../utils/errorUtils");
 const EmailUtils = require("../utils/emailUtils"); 
 const { Admin } = require('mongodb');
 const { use } = require('../routes/quizRoutes'); 
+const generateSecureToken = require("../helper/generateSecureToken")
 
 const SecureLinkGenerator = require("../helper/secureLinkHelper"); 
 
@@ -28,8 +29,6 @@ QuizController.createQuizMetaData = async (req, res) => {
             timeOut
         } = req.body;
 
-        console.log("req body", title, difficulty, timeOut, scope); 
-
         if( !title || !difficulty || !timeOut || !scope){
             return ErrorUtils.APIErrorResponse(res, ERRORS.MISSING_REQUIRED_QUIZ_FIELDS);
         }
@@ -42,7 +41,6 @@ QuizController.createQuizMetaData = async (req, res) => {
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
-        console.log("-->", creatorUserId)
 
         let userId = user.id;
         let userName = user.first_name;
@@ -159,8 +157,6 @@ QuizController.updateQuiz = async (req, res) => {
           questionToModify.options = questionUpdate.options || questionToModify.options;
           questionToModify.correctOptionIndex = questionUpdate.correctOptionIndex !== undefined ? questionUpdate.correctOptionIndex : questionToModify.correctOptionIndex;
           questionToModify.marks = questionUpdate.marks !== undefined ? questionUpdate.marks : questionToModify.marks;
-  
-          console.log(`Updated question: ${questionToModify.text}`);
         } else {
           console.warn(`Question update with ID/index ${questionUpdate._id || questionUpdate.index} not found in quiz`);
         }
@@ -275,7 +271,6 @@ QuizController.deleteQuiz = async(req, res) =>{
 //TODO: API to add quizzes into library 
 QuizController.addQuizzesToLibrary = async(req, res) => {
     const creatorId = req.user.id; 
-    console.log("user id: ", creatorId); 
     const quizId = req.body.quizId;
     const creatorUser = await AdminUser.find({_id: creatorId}); 
     if(!creatorUser){
@@ -308,7 +303,6 @@ QuizController.addQuizzesToLibrary = async(req, res) => {
 //TODO: API to get quiizes saved in your library 
 QuizController.getSaveQuizes = async(req, res) =>{
     const userId = req.user.id; 
-    console.log("user id", userId); 
     const user = await AdminUser.findById({_id: userId});
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
@@ -445,6 +439,61 @@ QuizController.generatePublicQuizLink = async(req, res) => {
             const token = jwt.sign({ quizId }, process.env.SECRET_KEY, { expiresIn: '2h' });
             res.json({ link: `${process.env.FRONTEND_URL}/play?token=${token}` });
         }   
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
+QuizController.generateSharedQuizLink = async(req, res) => {
+    const userId = req.user.id; 
+    const user = await AdminUser.findById({_id: userId});
+    if(!user){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+    try {
+       const { quizId } = req.params;  
+       const userEmail = user.creatorUserEmail; 
+       const quiz = await Quiz.findById(quizId); 
+       if(!quiz){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+        };  
+        if(quiz.sharedEmails.includes(userEmail)){
+            //Generate secure token link 
+            const token = generateSecureToken(quizId); 
+            // Send response with the link
+            res.status(200).json({ link: `https://example.com/quiz/play?token=${token}` });
+        }else{
+            return ErrorUtils.APIErrorResponse(res, ERRORS.ACCESS_DENIED)
+        }
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
+QuizController.generatePrivateQuizLink = async(req, res) =>{
+    const userId = req.user.id; 
+
+    const user = await AdminUser.findById({_id: userId});
+    if(!user){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+    }
+    const userEmail = user.email; 
+    console.log("creator Email", userEmail)
+    try {
+         const { quizId } = req.params;  
+         const quiz = await Quiz.findById(quizId);
+         if(!quiz){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND);
+         };
+         // Check if the quiz is private and if the creator's email matches the logged-in user's email
+        if ( quiz.creatorUserEmail === userEmail) {
+            // Generate a secure token
+            const token = generateSecureToken(quizId); // Implement this function
+            // Send the token in the response
+            res.status(200).json({ link: `https://example.com/quiz/play?token=${token}` });
+        } else {
+            return ErrorUtils.APIErrorResponse(res, ERRORS.ACCESS_DENIED)
+        }  
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
