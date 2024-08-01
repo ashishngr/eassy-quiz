@@ -263,6 +263,7 @@ import {
   TextField,
   Snackbar,
 } from "@mui/material";
+
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import copy from 'copy-to-clipboard';  // Ensure this package is installed
 import API from "../common/apis"; // Make sure API is correctly imported
@@ -276,13 +277,13 @@ const PlayQuiz = ({ quizId }) => {
   const handleClickOpen = async () => {
     console.log("Play button clicked, quizId:", quizId);
     try {
-      // Simulate API call with a hardcoded link for debugging
-      const response = { status: 200, data: { link: `http://example.com/quiz/${quizId}` } };
-      console.log("Simulated API response:", response);
-
+      const response = await API.getPrivateQuizLink(quizId);
+      console.log("API response:", response);
       if (response.status === 200) {
-        setLink(response.data.link);
-        setOpen(true);
+        const quizLink = response.data.link; // Assuming response contains link in data
+        window.open(quizLink, "_blank"); // Open link in a new browser tab
+        setSnackbarMessage("A new page has been opened where you can participate in the quiz.");
+        setSnackbarOpen(true);
       } else {
         setSnackbarMessage("Failed to generate link. Please try again.");
         setSnackbarOpen(true);
@@ -319,27 +320,6 @@ const PlayQuiz = ({ quizId }) => {
       <Button variant="contained" color="primary" onClick={handleClickOpen}>
         Play
       </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Share Quiz</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Quiz Link"
-            value={link}
-            fullWidth
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCopyClick} color="primary" startIcon={<FileCopyIcon />}>
-            Copy
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

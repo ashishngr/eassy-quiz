@@ -9,6 +9,7 @@ import UpdateQuiz from "../pages/UpdateQuiz";
 import CreateQuiz from "../pages/CreateQuiz";
 
 import RequireAuth from "../common/RequireAuth";
+import QuizDetailPage from "../pages/QuizDetailPage";
 
 
 function AdminRoutesWrapper  () {
@@ -47,6 +48,14 @@ function AdminRoutesWrapper  () {
                     element={
                         <RequireAuth>
                             <UpdateQuiz/>
+                        </RequireAuth>
+                    }
+                />
+                 <Route 
+                    path="quiz/:id/details"
+                    element={
+                        <RequireAuth>
+                            <QuizDetailPage/>
                         </RequireAuth>
                     }
                 />

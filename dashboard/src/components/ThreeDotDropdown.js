@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { IconButton, Menu, MenuItem, Button} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayQuiz from "./PlayQuiz"; 
 
 const ThreeDotDropdown = ({quizId}) => {
+
   const [anchorEl, setAnchorEl] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -23,6 +27,7 @@ const ThreeDotDropdown = ({quizId}) => {
   const handleViewClick = () => {
     // Handle view action
     handleClose();
+    navigate(`/admin/dashboard/quiz/${quizId}/details`);
   };
 
   return (
