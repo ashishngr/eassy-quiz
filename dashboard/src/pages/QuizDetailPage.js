@@ -43,7 +43,7 @@ const QuizDetailPage = () => {
       </div>
     </div>
     {/* Quiz Basic Details */} 
-    <div>
+    <div className='flex  justify-center'>
         <QuizBasicDetails 
         // quizId = {quizId}
         />

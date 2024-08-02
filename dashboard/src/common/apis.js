@@ -73,8 +73,8 @@ const API = {
     getPrivateQuizLink : async(quizId) =>{
       return await axios.get(`${API_BASE_URL}/api/v1/privateQiz/${quizId}`, getHeadersWithToken()); 
     }, 
-    getQuizDetails : async(quizId) => {
-      return await axios.get(`${API_BASE_URL}/api/v1//quiz/${quizId}`, getHeadersWithToken())
+    getQuizDetails : async(quizId) => { 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz/${quizId}`, getHeadersWithToken())
     }
   };
 export default API; 
