@@ -63,43 +63,31 @@ const QuestionForm = ({ index, question, onChange, onDelete, questions }) => {
               />
             </div>
             {question.options.map((option, optionIndex) => {
-              return (
-                <div key={optionIndex}>
-                  <label
-                    htmlFor={`option-${optionIndex}`}
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Wrong (Option) {optionIndex + 1}
-                  </label>
-                  <input
-                    type="text"
-                    id={`option-${optionIndex}`}
-                    name={`option-${optionIndex}`}
-                    class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder=" "
-                    required
-                    value={option}
-                    onChange={(e) =>
-                      onChange(index, `option${optionIndex}`, e.target.value)
-                    }
-                    label={`Option ${optionIndex + 1}`}
-                  />
-                </div>
-              );
-            })}
-            {/* <div>
-                    <label for="correctOption" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correct Answer</label>
-                    <input 
-                    type="text" 
-                    id="correctOption" 
-                    name='correctOption' 
-                    className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"  
-                    placeholder=" " 
-                    required
-                    value={question.correctOption}
-                    onChange={handleInputChange}
-                    />
-                </div> */}
+              const isLastOption = optionIndex === question.options.length - 1;
+  return (
+    <div key={optionIndex}>
+      <label
+        htmlFor={`option-${optionIndex}`}
+        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      >
+        {isLastOption ? `Right Option` : `Wrong (Option) ${optionIndex + 1}`}
+      </label>
+      <input
+        type="text"
+        id={`option-${optionIndex}`}
+        name={`option-${optionIndex}`}
+        className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder=" "
+        required
+        value={option}
+        onChange={(e) =>
+          onChange(index, `option${optionIndex}`, e.target.value)
+        }
+        label={`Option ${optionIndex + 1}`}
+      />
+    </div>
+  );
+})}
           </AccordionDetails>
         </Accordion>
       </div>
