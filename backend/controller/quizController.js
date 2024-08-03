@@ -8,9 +8,9 @@ var ObjectId = mongoose.Types.ObjectId;
 const {ERRORS} = require("../constants"); 
 const ErrorUtils = require("../utils/errorUtils"); 
 const EmailUtils = require("../utils/emailUtils"); 
-const { Admin } = require('mongodb');
-const { use } = require('../routes/quizRoutes'); 
-const generateSecureToken = require("../helper/generateSecureToken")
+const generateSecureToken = require("../helper/generateSecureToken") 
+
+const QuizLinkHelper = require("../helper/quizLinkHelper"); 
 
 const SecureLinkGenerator = require("../helper/secureLinkHelper"); 
 
@@ -488,7 +488,8 @@ QuizController.generatePrivateQuizLink = async(req, res) =>{
          // Check if the quiz is private and if the creator's email matches the logged-in user's email
         if ( quiz.creatorUserEmail === userEmail) {
             // Generate a secure token
-            const token = generateSecureToken(quizId); // Implement this function
+            // const token = generateSecureToken(quizId); // Implement this function 
+            const token  = QuizLinkHelper.generateToken(quizId); 
             // Send the token in the response
             res.status(200).json({ link: `https://example.com/quiz/play?token=${token}` });
         } else {
