@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from 'react'
-import { Paper, Typography, IconButton, Menu, MenuItem, Box, TextField, Grid, Button,  List, ListItem, ListItemText, } from '@mui/material'; 
+import { Paper, Typography, IconButton, Menu, MenuItem, Box, TextField, Grid, Button,  List, ListItem, ListItemText, CircularProgress, Snackbar} from '@mui/material'; 
 import Divider from '@mui/material/Divider';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import copy from 'copy-to-clipboard';  // Ensure this package is installed
+
 
 import { useParams } from 'react-router-dom';
 
@@ -22,6 +25,10 @@ export const QuizBasicDetails = () => {
     createdAt: '',
     questions: []
   });
+  const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const  quizId  = useParams().id;
   
@@ -54,7 +61,45 @@ export const QuizBasicDetails = () => {
   useEffect(()=>{
     fetchQuizData(); 
     console.log("Quiz Data", quizData)
-  },[])
+  },[]); 
+  const handleGenerateLink = async () => {
+    setLoading(true);
+    setLink("");
+    try {
+      // Simulate API call with a hardcoded link for debugging
+      const response = await API.getPrivateQuizLink(quizId);
+      console.log("Simulated API response:", response);
+
+      if (response.status === 200) {
+        setLink(response.data.link);
+        setSnackbarMessage("Link generated successfully.");
+        setSnackbarOpen(true);
+      } else {
+        setSnackbarMessage("Failed to generate link. Please try again.");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Error generating link:", error);
+      setSnackbarMessage("Error generating link. Please try again.");
+      setSnackbarOpen(true);
+    }
+    setLoading(false);
+  };
+  const handleCopyClick = () => {
+    if (link) {
+      copy(link);
+      setSnackbarMessage("Link copied to clipboard!");
+      setSnackbarOpen(true);
+    } else {
+      setSnackbarMessage("No link available to copy.");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
 
 
   return (
@@ -105,7 +150,33 @@ export const QuizBasicDetails = () => {
                   </React.Fragment>
                 ))}
               </List>
+              <Button variant="contained" color="primary" onClick={handleGenerateLink} disabled={loading}>
+        Generate Link
+        {loading && <CircularProgress size={24} />}
+      </Button>
+      {link && (
+        <div className="flex items-start mt-4 p-4"> 
+        <Typography variant="body1" className="mr-2">
+            <strong>Quiz Link:</strong> 
+          </Typography>
+       
           
+          <Typography variant="body2" className="break-words mb-2 max-w-3xl bg-gray-100 shadow-md rounded-md mt-4 p-4">
+            {link}
+          </Typography>
+          <Button onClick={handleCopyClick} color="primary" startIcon={<FileCopyIcon />}>
+            Copy
+          </Button>
+        
+          
+        </div>
+      )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
         </Box>
     </Paper>
   )
