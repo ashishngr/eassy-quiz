@@ -8,7 +8,7 @@ QuizLinkHelper.generateToken = (quizId) => {
         quizId,
         createdAt: new Date().toISOString(),
       };
-      const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' }); // Token expires in 1 hour
+      const token = jwt.sign(payload,  process.env.SECRET_KEY, { expiresIn: '1h' }); // Token expires in 1 hour
     return token;
 }
 QuizLinkHelper.validateToken = ( req, res, next) => {
@@ -17,9 +17,10 @@ QuizLinkHelper.validateToken = ( req, res, next) => {
         return res.status(401).json({ message: 'No token provided' });
     }
     try {
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.quizId = decoded.quizId;
-        next();
+      // Verify the token
+        const decoded = jwt.verify(token, secretKey);
+        const quizId = decoded.quizId; // Assuming the token contains quizId
+        return res.status(200).json({ valid: true, message: 'Token is valid', quizId });
       } catch (error) {
         return res.status(401).json({ message: 'Invalid token' });
     }

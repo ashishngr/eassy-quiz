@@ -29,6 +29,7 @@ mongoose.connect(uri)
 const authRoutes = require("./routes/authRoutes");
 const quizRoutes = require("./routes/quizRoutes"); 
 const profileRoutes = require("./routes/profileRoutes");
+const visitorRoutes = require("./routes/visitorRoutes")
 
 app.use(cors()); 
 app.use(bodyParser.json()); 
@@ -38,6 +39,8 @@ app.use(cookieParser());
 app.use("/api/v1", authRoutes); 
 app.use("/api/v1", quizRoutes); 
 app.use("/api/v1", profileRoutes); 
+app.use("/api/v1", visitorRoutes); 
+
 
 
 app.listen(PORT,()=> console.log("Server is running on port : " + PORT))

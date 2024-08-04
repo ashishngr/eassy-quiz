@@ -491,7 +491,7 @@ QuizController.generatePrivateQuizLink = async(req, res) =>{
             // const token = generateSecureToken(quizId); // Implement this function 
             const token  = QuizLinkHelper.generateToken(quizId); 
             // Send the token in the response
-            res.status(200).json({ link: `https://example.com/quiz/play?token=${token}` });
+            res.status(200).json({ link: `http://localhost:3001/quiz/landing-page?token=${token}` });
         } else {
             return ErrorUtils.APIErrorResponse(res, ERRORS.ACCESS_DENIED)
         }  
@@ -499,5 +499,26 @@ QuizController.generatePrivateQuizLink = async(req, res) =>{
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
     }
+};
+
+QuizController.validateQuizToken = async(req, res) =>{
+    const { token } = req.query; 
+
+    console.log("token to validate", token) 
+
+    if (!token) {
+        return res.status(400).json({ valid: false, message: 'Token is required' });
+    } 
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token,  process.env.SECRET_KEY);
+    const quizId = decoded.quizId; // Assuming the token contains quizId
+
+    return res.status(200).json({ valid: true, message: 'Token is valid', quizId });
+  } catch (error) {
+    console.error('Error validating token:', error);
+    return res.status(401).json({ valid: false, message: 'Invalid or expired token' });
+  }
 }
 
