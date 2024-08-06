@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import { Container, Typography, TextField, Button, Grid, Box } from '@mui/material';
 import {useNavigate, useLocation} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -15,15 +16,18 @@ const VisitorUserDetailsForm = () => {
     const [loading, setLoading] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState(''); 
-    const [quizId, setQuizId] = useState(null);
+    const [id, setId] = useState(null);
     const navigate = useNavigate(); 
     const location = useLocation();
+    const { quizId } = useParams();
+    console.log("QuizId:", quizId);
 
     useEffect(() => {
-      const query = new URLSearchParams(location.search);
-      const quizIdFromUrl = query.get('quizId');
-      setQuizId(quizIdFromUrl);
-    }, [location.search]);
+      // Corrected log statement
+      setId(quizId);
+    }, []); 
+  
+    console.log("QuizId after setting state:", id);
 
 
     const handleChange = (e) => {
@@ -37,16 +41,18 @@ const VisitorUserDetailsForm = () => {
         e.preventDefault();
         console.log('Form Data:', formData);
         // Proceed to next step 
-        const response = await axios.post("/http://localhost:8080/api/v1/save-visitor-user-details", {
+        const response = await axios.post("http://localhost:8080/api/v1/save-visitor-user-details", {
           name : formData.name, 
           email : formData.email, 
           phoneNumber : formData.phoneNumber, 
           dob : formData.dob, 
           occupation : formData.occupation, 
           quizId : quizId
-        }); 
-        
-        // navigate("/quiz/play"); 
+        })
+        console.log("Response of visitor user basic details", response.data)
+        if(response.status == 201){
+          navigate(`/quiz/play/${id}`); 
+        }
       };
       
   return (
