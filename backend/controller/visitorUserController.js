@@ -7,7 +7,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const ErrorUtils = require("../utils/errorUtils"); 
  
-
 const VisitorUserController = module.exports; 
 
 VisitorUserController.saveVisitorUserDetails = async(req, res) =>{
