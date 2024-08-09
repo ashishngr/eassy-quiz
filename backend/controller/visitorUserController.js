@@ -33,3 +33,22 @@ VisitorUserController.saveVisitorUserDetails = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res);
     }
 }
+VisitorUserController.getQuizInformation = async(req, res) => {
+    try {
+        const {quizId} = req.params; 
+        const quiz = await Quiz.findById(quizId).select('creatorUserId timeOut questions')
+        if(!quiz){
+            return  ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND)
+        }
+        res.status(200).json({
+            data : {
+                creatorUserId: quiz.creatorUserId,
+                questions: quiz.questions,
+                timeout: quiz.timeOut
+            }
+        })
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
