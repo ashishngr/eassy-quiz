@@ -31,12 +31,16 @@ const VisitorUserDetailsForm = () => {
 
 
     const handleChange = (e) => {
+
         const { name, value } = e.target;
         setFormData({
           ...formData,
           [name]: value
         });
       }; 
+      useEffect(()=>{
+
+      },[])
       const handleSubmit = async(e) => {
         e.preventDefault();
         console.log('Form Data:', formData);
@@ -51,7 +55,7 @@ const VisitorUserDetailsForm = () => {
         })
         console.log("Response of visitor user basic details", response.data)
         if(response.status == 201){
-          navigate(`/quiz/play/${id}`); 
+          navigate(`/quiz/play/quiz/${quizId}`); 
         }
       };
       

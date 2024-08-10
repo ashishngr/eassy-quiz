@@ -13,7 +13,7 @@ function VisitorRoutesWrapper(){
             <Route path='/landing-page' element={<LandingPage />}/> 
             <Route path="/error" element={<ErrorPage />} />  {/* Error route */} 
             <Route path='/visitor-user-details/:quizId' element={<VisitorUserDetailPage />}/>
-            <Route path='/quiz/play/:quizId' element={<QuizPage />}/>
+            <Route path='/play/quiz/:quizId' element={<QuizPage />} />
         </Routes>
     )
 }

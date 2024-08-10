@@ -1,86 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; 
+import axios from "axios";
+import { useParams } from "react-router-dom"; 
+
 const QuizPage = () => {
-  // Sample questions data
-  const questions = [
-    {
-      question: "What is the capital of France?",
-      options: ["Paris", "London", "Berlin", "Madrid"],
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-    },
-    {
-      question: "What is the largest ocean on Earth?",
-      options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    },
-    {
-      question: 'Who wrote "Romeo and Juliet"?',
-      options: [
-        "William Shakespeare",
-        "Charles Dickens",
-        "Mark Twain",
-        "Jane Austen",
-      ],
-    },
-    {
-      question: "What is the smallest prime number?",
-      options: ["0", "1", "2", "3"],
-    },
-    {
-      question: "What is the capital of France?",
-      options: ["Paris", "London", "Berlin", "Madrid"],
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-    },
-    {
-      question: "What is the largest ocean on Earth?",
-      options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    },
-    {
-      question: 'Who wrote "Romeo and Juliet"?',
-      options: [
-        "William Shakespeare",
-        "Charles Dickens",
-        "Mark Twain",
-        "Jane Austen",
-      ],
-    },
-    {
-      question: "What is the smallest prime number?",
-      options: ["0", "1", "2", "3"],
-    },
-    {
-      question: "What is the capital of France?",
-      options: ["Paris", "London", "Berlin", "Madrid"],
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Earth", "Mars", "Jupiter", "Saturn"],
-    },
-    {
-      question: "What is the largest ocean on Earth?",
-      options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    },
-    {
-      question: 'Who wrote "Romeo and Juliet"?',
-      options: [
-        "William Shakespeare",
-        "Charles Dickens",
-        "Mark Twain",
-        "Jane Austen",
-      ],
-    },
-    {
-      question: "What is the smallest prime number?",
-      options: ["0", "1", "2", "3"],
-    },
-  ];
-
+  const { quizId } = useParams(); 
+  const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(()=>{
+   
+    fetchQuizData();
+  },[quizId])
+    const fetchQuizData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/v1/quiz-information/${quizId}`)
+      console.log("Quiz response", response.data.data)
+      const { questions } = response.data.data; 
+      setQuestions(questions);
+      setLoading(false);
+      
+    } catch (error) {
+      setError("Failed to load quiz data");
+      setLoading(false);
+    }
+  }
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -92,7 +36,11 @@ const QuizPage = () => {
 
   const handleQuestionClick = (index) => {
     setCurrentQuestionIndex(index);
-  };
+  }; 
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  if (questions.length === 0) return <p>No questions available.</p>;
+
   return (
     <div className="container mx-auto p-4">
       <header className="bg-gray-100 text-black p-4 rounded mb-4 flex justify-center items-center">
@@ -101,19 +49,19 @@ const QuizPage = () => {
         </h1>
       </header>
 
-      <div className="flex">
+     <div className="flex">
         <div className="flex-1 mr-4">
           <div className="bg-white shadow p-4 rounded mb-4">
             <div className="flex justify-center items-center h-54 m-10">
               <div className="bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg max-w-md">
                 <h2 className="text-lg font-semibold text-center">
-                  {questions[currentQuestionIndex].question}
+                  {questions[currentQuestionIndex]?.text}
                 </h2>
               </div>
             </div>
 
             <div className="flex flex-col flex-wrap gap-5 mb-4 ">
-              {questions[currentQuestionIndex].options.map((option, index) => (
+              {questions[currentQuestionIndex]?.options.map((option, index) => (
                 <button
                   key={index}
                   className="bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1"
