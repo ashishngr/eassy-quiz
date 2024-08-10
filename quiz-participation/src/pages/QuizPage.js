@@ -2,22 +2,40 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom"; 
 
+// / Utility function to shuffle an array (Fisher-Yates Shuffle)
+const shuffleArray = (array) => {
+  const shuffledArray = array.slice(); // Create a copy of the array
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  return shuffledArray;
+};
+
 const QuizPage = () => {
   const { quizId } = useParams(); 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState({}); // Track selected options
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   useEffect(()=>{
-   
     fetchQuizData();
   },[quizId])
+
     const fetchQuizData = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/api/v1/quiz-information/${quizId}`)
       console.log("Quiz response", response.data.data)
       const { questions } = response.data.data; 
-      setQuestions(questions);
+     // Shuffle the options for each question
+     const shuffledQuestions = questions.map((question) => ({
+      ...question,
+      options: shuffleArray(question.options),
+      }));
+      console.log("Shuffled Questions", shuffledQuestions); // Debugging log
+      setQuestions(shuffledQuestions);
       setLoading(false);
       
     } catch (error) {
@@ -25,6 +43,16 @@ const QuizPage = () => {
       setLoading(false);
     }
   }
+  // Handle selection of an option
+  const handleOptionSelect = (questionIndex, optionIndex) => {
+    // If an option is already selected for this question, don't allow re-selection
+    if (selectedOptions[questionIndex] !== undefined) return;
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [questionIndex]: optionIndex,
+    }));
+    setAnsweredQuestions((prev) => new Set(prev).add(questionIndex));
+  };
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -37,9 +65,18 @@ const QuizPage = () => {
   const handleQuestionClick = (index) => {
     setCurrentQuestionIndex(index);
   }; 
+
+
+   // Count the number of answered and remaining questions
+   const answeredQuestionsCount = Object.keys(selectedOptions).length;
+   const remainingQuestionsCount = questions.length - answeredQuestionsCount;
+ 
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-  if (questions.length === 0) return <p>No questions available.</p>;
+  if (questions?.length === 0) return <p>No questions available.</p>;
+
+  
 
   return (
     <div className="container mx-auto p-4">
@@ -64,7 +101,13 @@ const QuizPage = () => {
               {questions[currentQuestionIndex]?.options.map((option, index) => (
                 <button
                   key={index}
-                  className="bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1"
+                  className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 ${
+                    selectedOptions[currentQuestionIndex] === index
+                      ? "bg-green-500 text-white"
+                      : ""
+                  }`}
+                  onClick={() => handleOptionSelect(currentQuestionIndex, index)}
+                  disabled={selectedOptions[currentQuestionIndex] !== undefined}
                 >
                   {option}
                 </button>
@@ -94,10 +137,10 @@ const QuizPage = () => {
             <div className="text-center mb-4">
               <h1 className="text-xl font-bold">Leaderboard</h1>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Answered Questions:</span> 2
+                <span className="font-semibold">Answered Questions:</span> {answeredQuestionsCount}
               </p>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Left Questions:</span> 3
+                <span className="font-semibold">Left Questions:</span> {remainingQuestionsCount}
               </p>
             </div>
             <div className="flex flex-row flex-wrap items-center">
@@ -105,7 +148,9 @@ const QuizPage = () => {
                 <button
                   key={index}
                   className={`m-1 p-3 w-16 rounded ${
-                    index === currentQuestionIndex
+                    answeredQuestions.has(index)
+                      ? "bg-green-500 text-white" // Mark as green if the question is answered
+                      : index === currentQuestionIndex
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200"
                   }`}
