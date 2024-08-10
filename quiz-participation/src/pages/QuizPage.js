@@ -1,92 +1,130 @@
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom"; 
-
-// / Utility function to shuffle an array (Fisher-Yates Shuffle)
-const shuffleArray = (array) => {
-  const shuffledArray = array.slice(); // Create a copy of the array
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-  }
-  return shuffledArray;
-};
+import { useParams, useNavigate } from "react-router-dom";
 
 const QuizPage = () => {
-  const { quizId } = useParams(); 
+  const { quizId } = useParams();
+  const navigate = useNavigate();
+
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState({}); // Track selected options
-  const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  useEffect(()=>{
-    fetchQuizData();
-  },[quizId])
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [correctOptions, setCorrectOptions] = useState([]);
+  const [timer, setTimer] = useState(40);
 
-    const fetchQuizData = async () => {
+  // Fetch quiz data on initial load
+  useEffect(() => {
+    fetchQuizData();
+  }, [quizId]);
+
+  // Timer functionality
+  useEffect(() => {
+    if (timer === 0) {
+      handleNextQuestion();
+      return;
+    }
+    const interval = setInterval(() => {
+      setTimer((prevTimer) => prevTimer - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  // Fetch quiz data function
+  const fetchQuizData = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/quiz-information/${quizId}`)
-      console.log("Quiz response", response.data.data)
-      const { questions } = response.data.data; 
-     // Shuffle the options for each question
-     const shuffledQuestions = questions.map((question) => ({
-      ...question,
-      options: shuffleArray(question.options),
-      }));
-      console.log("Shuffled Questions", shuffledQuestions); // Debugging log
-      setQuestions(shuffledQuestions);
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/quiz-information/${quizId}`
+      );
+      const { questions } = response.data.data;
+
+      // Capture correct options before randomization
+      const correctOptionsTemp = questions.map(
+        (question) => question.options[question.correctOptionIndex]
+      );
+      setCorrectOptions(correctOptionsTemp);
+
+      // Randomize options
+      const randomizedQuestions = questions.map((question) => {
+        return {
+          ...question,
+          options: question.options.sort(() => Math.random() - 0.5),
+        };
+      });
+
+      setQuestions(randomizedQuestions);
       setLoading(false);
-      
     } catch (error) {
       setError("Failed to load quiz data");
       setLoading(false);
     }
-  }
-  // Handle selection of an option
-  const handleOptionSelect = (questionIndex, optionIndex) => {
-    // If an option is already selected for this question, don't allow re-selection
-    if (selectedOptions[questionIndex] !== undefined) return;
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [questionIndex]: optionIndex,
-    }));
-    setAnsweredQuestions((prev) => new Set(prev).add(questionIndex));
   };
+
+  // Handle answer submission
+  const handleOptionClick = (selectedOption) => {
+    const correctOption = correctOptions[currentQuestionIndex];
+    const points = selectedOption === correctOption ? 1 : 0;
+
+    const newResult = {
+      text: questions[currentQuestionIndex].text,
+      userSubmittedOption: selectedOption,
+      correctOption: correctOption,
+      points: points,
+    };
+
+    setSelectedOptions([...selectedOptions, newResult]);
+
+    handleNextQuestion();
+  };
+
+  // Navigate to next question
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setTimer(40);
+    } else {
+      navigateToSummary();
     }
   };
-  const handlePreviousQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+
+  // Handle skip to end functionality
+  const handleSkipToEnd = () => {
+    const remainingQuestions = questions.slice(currentQuestionIndex);
+
+    // Capture results for remaining questions as unanswered
+    const skippedResults = remainingQuestions.map((question, index) => ({
+      text: question.text,
+      userSubmittedOption: "Skipped",
+      correctOption: correctOptions[currentQuestionIndex + index],
+      points: 0,
+    }));
+
+    setSelectedOptions((prev) => [...prev, ...skippedResults]);
+
+    navigateToSummary();
   };
 
-  const handleQuestionClick = (index) => {
-    setCurrentQuestionIndex(index);
-  }; 
-
-
-   // Count the number of answered and remaining questions
-   const answeredQuestionsCount = Object.keys(selectedOptions).length;
-   const remainingQuestionsCount = questions.length - answeredQuestionsCount;
- 
+  // Navigate to summary page
+  const navigateToSummary = () => {
+    console.log("Final Results:", selectedOptions);
+    navigate("/quiz/summary", { state: { results: selectedOptions } });
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-  if (questions?.length === 0) return <p>No questions available.</p>;
-
-  
+  if (questions.length === 0) return <p>No questions available.</p>;
 
   return (
     <div className="container mx-auto p-4">
-      <header className="bg-gray-100 text-black p-4 rounded mb-4 flex justify-center items-center">
+      <header className="bg-gray-100 text-black p-4 rounded mb-4 flex justify-between items-center">
         <h1 className="text-xl font-bold">
           {`${currentQuestionIndex + 1}/${questions.length} Questions`}
         </h1>
+        <p className="text-xl font-bold">{`Time left: ${timer}s`}</p>
       </header>
 
-     <div className="flex">
+      <div className="flex">
         <div className="flex-1 mr-4">
           <div className="bg-white shadow p-4 rounded mb-4">
             <div className="flex justify-center items-center h-54 m-10">
@@ -97,30 +135,21 @@ const QuizPage = () => {
               </div>
             </div>
 
-            <div className="flex flex-col flex-wrap gap-5 mb-4 ">
-              {questions[currentQuestionIndex]?.options.map((option, index) => (
-                <button
-                  key={index}
-                  className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 ${
-                    selectedOptions[currentQuestionIndex] === index
-                      ? "bg-green-500 text-white"
-                      : ""
-                  }`}
-                  onClick={() => handleOptionSelect(currentQuestionIndex, index)}
-                  disabled={selectedOptions[currentQuestionIndex] !== undefined}
-                >
-                  {option}
-                </button>
-              ))}
+            <div className="flex flex-col flex-wrap gap-5 mb-4">
+              {questions[currentQuestionIndex]?.options.map(
+                (option, index) => (
+                  <button
+                    key={index}
+                    className="bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1"
+                    onClick={() => handleOptionClick(option)}
+                    disabled={timer === 0 || selectedOptions[currentQuestionIndex]}
+                  >
+                    {option}
+                  </button>
+                )
+              )}
             </div>
-            <div className="text-center  flex justify-center items-center gap-4">
-              <button
-                onClick={handlePreviousQuestion}
-                className="bg-gray-200 text-black p-2 rounded"
-                disabled={currentQuestionIndex === 0} // Disable if on the first question
-              >
-                Previous
-              </button>
+            <div className="text-center flex justify-center items-center gap-4">
               <button
                 onClick={handleNextQuestion}
                 className="bg-blue-500 text-white p-2 rounded"
@@ -137,10 +166,12 @@ const QuizPage = () => {
             <div className="text-center mb-4">
               <h1 className="text-xl font-bold">Leaderboard</h1>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Answered Questions:</span> {answeredQuestionsCount}
+                <span className="font-semibold">Answered Questions:</span>{" "}
+                {selectedOptions.length}
               </p>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Left Questions:</span> {remainingQuestionsCount}
+                <span className="font-semibold">Left Questions:</span>{" "}
+                {questions.length - selectedOptions.length}
               </p>
             </div>
             <div className="flex flex-row flex-wrap items-center">
@@ -148,19 +179,22 @@ const QuizPage = () => {
                 <button
                   key={index}
                   className={`m-1 p-3 w-16 rounded ${
-                    answeredQuestions.has(index)
-                      ? "bg-green-500 text-white" // Mark as green if the question is answered
-                      : index === currentQuestionIndex
+                    index === currentQuestionIndex
                       ? "bg-blue-500 text-white"
+                      : selectedOptions[index]
+                      ? "bg-green-500 text-white"
                       : "bg-gray-200"
                   }`}
-                  onClick={() => handleQuestionClick(index)}
+                  onClick={() => setCurrentQuestionIndex(index)}
                 >
                   {index + 1}
                 </button>
               ))}
             </div>
-            <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              onClick={handleSkipToEnd}
+            >
               Skip To End
             </button>
           </div>

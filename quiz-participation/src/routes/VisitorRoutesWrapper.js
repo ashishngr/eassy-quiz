@@ -5,6 +5,7 @@ import LandingPage from '../pages/LandingPage';
 import ErrorPage from '../pages/ErrorPage';
 import VisitorUserDetailPage from '../pages/VisitorUserDetailPage';
 import QuizPage from '../pages/QuizPage';
+import SummaryPage from "../pages/SummaryPage"
 
 function VisitorRoutesWrapper(){
     return(
@@ -14,6 +15,7 @@ function VisitorRoutesWrapper(){
             <Route path="/error" element={<ErrorPage />} />  {/* Error route */} 
             <Route path='/visitor-user-details/:quizId' element={<VisitorUserDetailPage />}/>
             <Route path='/play/quiz/:quizId' element={<QuizPage />} />
+            <Route path='/summary' element={<SummaryPage />}/>
         </Routes>
     )
 }
