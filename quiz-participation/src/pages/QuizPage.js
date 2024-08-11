@@ -6,6 +6,7 @@ const QuizPage = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
 
+  // State to manage quiz data and user interactions
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -13,6 +14,7 @@ const QuizPage = () => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [correctOptions, setCorrectOptions] = useState([]);
   const [timer, setTimer] = useState(40);
+  const [disabledOptions, setDisabledOptions] = useState([]);
 
   // Fetch quiz data on initial load
   useEffect(() => {
@@ -22,14 +24,23 @@ const QuizPage = () => {
   // Timer functionality
   useEffect(() => {
     if (timer === 0) {
-      handleNextQuestion();
+      handleOptionDisable(currentQuestionIndex);
       return;
     }
+
+    if (
+      selectedOptions[currentQuestionIndex] ||
+      disabledOptions.includes(currentQuestionIndex)
+    ) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
+
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [timer, currentQuestionIndex]);
 
   // Fetch quiz data function
   const fetchQuizData = async () => {
@@ -63,6 +74,10 @@ const QuizPage = () => {
 
   // Handle answer submission
   const handleOptionClick = (selectedOption) => {
+    if (timer === 0 || disabledOptions.includes(currentQuestionIndex)) {
+      return; // Prevent submission if time is up or options are disabled
+    }
+
     const correctOption = correctOptions[currentQuestionIndex];
     const points = selectedOption === correctOption ? 1 : 0;
 
@@ -73,18 +88,46 @@ const QuizPage = () => {
       points: points,
     };
 
-    setSelectedOptions([...selectedOptions, newResult]);
+    const newSelectedOptions = [...selectedOptions];
+    newSelectedOptions[currentQuestionIndex] = newResult;
+    setSelectedOptions(newSelectedOptions);
 
-    handleNextQuestion();
+    handleOptionDisable(currentQuestionIndex); // Disable options after submission
+  };
+
+  // Disable options for the current question
+  const handleOptionDisable = (questionIndex) => {
+    if (!disabledOptions.includes(questionIndex)) {
+      setDisabledOptions((prev) => [...prev, questionIndex]);
+    }
   };
 
   // Navigate to next question
   const handleNextQuestion = () => {
+    // Add check for unanswered questions
+    if (!selectedOptions[currentQuestionIndex]) {
+      const unansweredResult = {
+        text: questions[currentQuestionIndex].text,
+        userSubmittedOption: "Unanswered",
+        correctOption: correctOptions[currentQuestionIndex],
+        points: 0,
+      };
+      const newSelectedOptions = [...selectedOptions];
+      newSelectedOptions[currentQuestionIndex] = unansweredResult;
+      setSelectedOptions(newSelectedOptions);
+    }
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setTimer(40);
     } else {
       navigateToSummary();
+    }
+  };
+
+  // Navigate to previous question
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
@@ -140,9 +183,21 @@ const QuizPage = () => {
                 (option, index) => (
                   <button
                     key={index}
-                    className="bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1"
+                    className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 ${
+                      selectedOptions[currentQuestionIndex]?.userSubmittedOption === option
+                        ? "bg-green-200"
+                        : ""
+                    } ${
+                      timer === 0 || disabledOptions.includes(currentQuestionIndex)
+                        ? "bg-red-100"
+                        : ""
+                    }`}
                     onClick={() => handleOptionClick(option)}
-                    disabled={timer === 0 || selectedOptions[currentQuestionIndex]}
+                    disabled={
+                      timer === 0 ||
+                      disabledOptions.includes(currentQuestionIndex) ||
+                      selectedOptions[currentQuestionIndex]
+                    }
                   >
                     {option}
                   </button>
@@ -150,6 +205,13 @@ const QuizPage = () => {
               )}
             </div>
             <div className="text-center flex justify-center items-center gap-4">
+              <button
+                onClick={handlePreviousQuestion}
+                className="bg-gray-200 text-black p-2 rounded"
+                disabled={currentQuestionIndex === 0}
+              >
+                Previous
+              </button>
               <button
                 onClick={handleNextQuestion}
                 className="bg-blue-500 text-white p-2 rounded"
@@ -167,11 +229,11 @@ const QuizPage = () => {
               <h1 className="text-xl font-bold">Leaderboard</h1>
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Answered Questions:</span>{" "}
-                {selectedOptions.length}
+                {selectedOptions.filter((opt) => opt).length}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Left Questions:</span>{" "}
-                {questions.length - selectedOptions.length}
+                {questions.length - selectedOptions.filter((opt) => opt).length}
               </p>
             </div>
             <div className="flex flex-row flex-wrap items-center">
