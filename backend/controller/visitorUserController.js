@@ -52,3 +52,23 @@ VisitorUserController.getQuizInformation = async(req, res) => {
         return ErrorUtils.APIErrorResponse(res);
     }
 }
+VisitorUserController.quizParticipation = async(req, res) =>{
+    const {quizId, questions, isComplete, visitorUserId} = req.body; 
+    // Validate input
+    if (!visitorUserId ||!quizId || !questions || isComplete === undefined) {
+        return ErrorUtils.APIErrorResponse(res, ERRORS.GENERIC_BAD_REQUEST);
+    }
+    try {
+        const newQuizParticipation = new QuizParticipation({
+            quizId,
+            questions,
+            isComplete, 
+            visitorUserId
+        });
+        await newQuizParticipation.save();
+        res.status(200).json({ message: 'Quiz Participation created successfully'});
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res);
+    }
+}
