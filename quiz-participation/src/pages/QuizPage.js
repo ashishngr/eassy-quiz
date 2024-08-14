@@ -102,6 +102,13 @@ const QuizPage = () => {
     }
   };
 
+  // Navigate to previous question
+const handlePreviousQuestion = () => {
+  if (currentQuestionIndex > 0) {
+    setCurrentQuestionIndex(currentQuestionIndex - 1);
+  }
+};
+
   // Navigate to next question
   const handleNextQuestion = () => {
     // Add check for unanswered questions
@@ -124,13 +131,6 @@ const QuizPage = () => {
     }
   };
 
-  // Navigate to previous question
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
   // Handle skip to end functionality
   const handleSkipToEnd = () => {
     const remainingQuestions = questions.slice(currentQuestionIndex);
@@ -150,6 +150,18 @@ const QuizPage = () => {
 
   // Navigate to summary page
   const navigateToSummary = () => {
+    // Added logic to handle unanswered last question
+    if (!selectedOptions[currentQuestionIndex]) {
+      const unansweredResult = {
+        text: questions[currentQuestionIndex].text,
+        userSubmittedOption: "Unanswered",
+        correctOption: correctOptions[currentQuestionIndex],
+        points: 0,
+      };
+      const newSelectedOptions = [...selectedOptions];
+      newSelectedOptions[currentQuestionIndex] = unansweredResult;
+      setSelectedOptions(newSelectedOptions);
+    }
     console.log("Final Results:", selectedOptions);
     navigate("/quiz/summary", { state: { results: selectedOptions } });
   };
