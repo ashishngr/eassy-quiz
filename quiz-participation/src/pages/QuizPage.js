@@ -24,21 +24,35 @@ const QuizPage = () => {
   // Timer functionality
   useEffect(() => {
     if (timer === 0) {
-      handleOptionDisable(currentQuestionIndex);
+      handleOptionDisable(currentQuestionIndex); // Disable options when time is up
+      
+      // Capture as 'Unanswered' if no option was selected when time ran out
+      if (!selectedOptions[currentQuestionIndex]) {
+        const unansweredResult = {
+          text: questions[currentQuestionIndex]?.text,
+          userSubmittedOption: "Unanswered",
+          correctOption: correctOptions[currentQuestionIndex],
+          points: 0,
+        };
+        const newSelectedOptions = [...selectedOptions];
+        newSelectedOptions[currentQuestionIndex] = unansweredResult;
+        setSelectedOptions(newSelectedOptions);
+      }
+  
       return;
     }
-
+  
     if (
       selectedOptions[currentQuestionIndex] ||
       disabledOptions.includes(currentQuestionIndex)
     ) {
       return;
     }
-
+  
     const interval = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
-
+  
     return () => clearInterval(interval);
   }, [timer, currentQuestionIndex]);
 
@@ -132,8 +146,10 @@ const handlePreviousQuestion = () => {
   };
 
   // Handle skip to end functionality
-  const handleSkipToEnd = () => {
+  const handleSkipToEnd = async() => {
     const remainingQuestions = questions.slice(currentQuestionIndex);
+    console.log("Skip to end: ", remainingQuestions);
+
 
     // Capture results for remaining questions as unanswered
     const skippedResults = remainingQuestions.map((question, index) => ({
@@ -143,9 +159,30 @@ const handlePreviousQuestion = () => {
       points: 0,
     }));
 
-    setSelectedOptions((prev) => [...prev, ...skippedResults]);
+    // setSelectedOptions((prev) => [...prev, ...skippedResults]);
+    // navigateToSummary(); 
+    const finalResults = [...selectedOptions, ...skippedResults];
+    setSelectedOptions(finalResults); 
 
-    navigateToSummary();
+     // Determine if the quiz is complete
+     const isComplete = finalResults.length === questions.length;
+
+    try {
+      // API call to save quiz participation data to the database
+      await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
+        quizId,                       // Quiz ID
+        isComplete: false,            // Quiz not fully completed by user
+        participationTime: new Date(),// Time when the user ends participation
+        questions: finalResults       // Final results including skipped questions
+      });
+  
+      // Navigate to the summary page after successful save
+      navigateToSummary();
+    } catch (error) {
+      console.error("Error saving quiz participation data:", error);
+      // Optionally handle errors, e.g., show an error message to the user
+    }
+
   };
 
   // Navigate to summary page
@@ -195,15 +232,9 @@ const handlePreviousQuestion = () => {
                 (option, index) => (
                   <button
                     key={index}
-                    className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 ${
-                      selectedOptions[currentQuestionIndex]?.userSubmittedOption === option
-                        ? "bg-green-200"
-                        : ""
-                    } ${
-                      timer === 0 || disabledOptions.includes(currentQuestionIndex)
-                        ? "bg-red-100"
-                        : ""
-                    }`}
+                    className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 
+                      ${selectedOptions[currentQuestionIndex]?.userSubmittedOption === option ? "bg-green-200" : ""} 
+                    `}
                     onClick={() => handleOptionClick(option)}
                     disabled={
                       timer === 0 ||
