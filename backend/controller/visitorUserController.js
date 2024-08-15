@@ -53,9 +53,9 @@ VisitorUserController.getQuizInformation = async(req, res) => {
     }
 }
 VisitorUserController.quizParticipation = async(req, res) =>{
-    const {quizId, questions, isComplete, visitorUserId} = req.body; 
+    const {quizId, questions, isComplete } = req.body; 
     // Validate input
-    if (!visitorUserId ||!quizId || !questions || isComplete === undefined) {
+    if (!quizId || !questions || isComplete === undefined) {
         return ErrorUtils.APIErrorResponse(res, ERRORS.GENERIC_BAD_REQUEST);
     }
     try {

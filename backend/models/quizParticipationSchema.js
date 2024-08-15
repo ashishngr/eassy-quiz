@@ -7,11 +7,6 @@ const quizParticipationSchema = new mongoose.Schema({
         ref: 'Quiz',
         required: true
     },
-    VisitorUserId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'VisitorUser',
-        required: true
-    },
     questions: [
         {
           questionText: { type: String, required: true },
@@ -20,15 +15,19 @@ const quizParticipationSchema = new mongoose.Schema({
           pointsAwarded: { type: Number, required: true, min: 0, max: 1 }
         }
     ],
-    participationTime: {
-        type: Date,
-        default: Date.now,
-    },
     isComplete: {
         type: Boolean,
         required: true,
     }
-})
+},
+{
+    collection: "QuizParticipation", 
+    timestamps: {
+        createdAt: "created_at", 
+        updatedAt: "updated_at", 
+    }, 
+}
+)
 const QuizParticipation = mongoose.model('QuizParticipation', quizParticipationSchema);
 
 module.exports = {
