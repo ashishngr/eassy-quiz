@@ -1,6 +1,7 @@
 const express = require('express'); 
 const {Quiz} = require("../models/quizSchema"); 
-const {VisitorUser} = require("../models/visitorUserSchema")
+const {VisitorUser} = require("../models/visitorUserSchema"); 
+const {QuizParticipation} = require("../models/quizParticipationSchema")
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY; 
 
@@ -63,7 +64,6 @@ VisitorUserController.quizParticipation = async(req, res) =>{
             quizId,
             questions,
             isComplete, 
-            visitorUserId
         });
         await newQuizParticipation.save();
         res.status(200).json({ message: 'Quiz Participation created successfully'});

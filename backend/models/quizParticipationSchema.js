@@ -9,11 +9,11 @@ const quizParticipationSchema = new mongoose.Schema({
     },
     questions: [
         {
-          questionText: { type: String, required: true },
+          text: { type: String, required: true },
           correctOption: { type: String, required: true },
           userSubmittedOption: { type: String, required: true },
-          pointsAwarded: { type: Number, required: true, min: 0, max: 1 }
-        }
+          points: { type: Number, required: true, min: 0, max: 1 }
+        }     
     ],
     isComplete: {
         type: Boolean,
