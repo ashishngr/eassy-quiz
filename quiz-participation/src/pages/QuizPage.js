@@ -164,6 +164,9 @@ const handlePreviousQuestion = () => {
     const finalResults = [...selectedOptions, ...skippedResults];
     setSelectedOptions(finalResults); 
 
+    console.log("Final Result", finalResults); 
+
+
      // Determine if the quiz is complete
      const isComplete = finalResults.length === questions.length;
 
@@ -171,9 +174,9 @@ const handlePreviousQuestion = () => {
       // API call to save quiz participation data to the database
       await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
         quizId,                       // Quiz ID
-        isComplete: false,            // Quiz not fully completed by user
-        participationTime: new Date(),// Time when the user ends participation
-        questions: finalResults       // Final results including skipped questions
+        isComplete: isComplete,            // Quiz not fully completed by user
+        questions: finalResults, 
+        
       });
   
       // Navigate to the summary page after successful save
