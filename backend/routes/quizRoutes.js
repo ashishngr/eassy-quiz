@@ -14,7 +14,7 @@ router.put("/quiz/:id", validateToken, QuizController.updateQuiz);
 router.get("/quiz/:id", validateToken, QuizController.singleQuiz); 
 router.delete("/quiz/:id", validateToken, QuizController.deleteQuiz); 
 router.post("/save", validateToken, QuizController.addQuizzesToLibrary);  
-router.get("/saved", validateToken, QuizController.getSaveQuizes);
+router.get("/save-quizes", validateToken, QuizController.getSaveQuizes);
 router.get("/public", validateToken, QuizController.getPublicQuizzes); 
 router.get("/latesQuiz", validateToken, QuizController.latestTenQuizes); 
 router.get("/stats", validateToken, QuizController.quizStats);

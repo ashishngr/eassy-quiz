@@ -287,13 +287,15 @@ QuizController.addQuizzesToLibrary = async(req, res) => {
         }
         //Check if quiz already saved by user 
         if (quiz.savedBy.includes(creatorId)) {
-            return ErrorUtils.APIErrorResponse(res, ERRORS.QUIZ_ALREADY_SAVED);
+            return res.status(200).json({
+                message : "Quiz Is Already saved"
+            })
         }; 
         // Add user ID to the savedBy array
         quiz.savedBy.push(creatorId);
         await quiz.save();
 
-        res.status(200).json({ message: 'Quiz saved successfully' });
+        res.status(200).json({ message: 'Quiz Saved Successfully' });
 
     } catch (error) {
         console.log(error); 
@@ -315,11 +317,13 @@ QuizController.getSaveQuizes = async(req, res) =>{
       })
     } 
     const response = quizzes.map(quiz => ({
+        id : quiz._id,
         title: quiz.title, 
         creatorUserName: quiz.creatorUserName,
     }))
     res.status(200).json({
-        data : response
+        data : response, 
+        message: "Returning all the saved quizzes to your library"
     });
 
     } catch (error) {
@@ -330,7 +334,9 @@ QuizController.getSaveQuizes = async(req, res) =>{
 //TODO : API to get most popular public quizzes  
 QuizController.getPublicQuizzes = async(req, res) =>{
     const userId = req.user.id; 
-    const user = await AdminUser.findById({_id: userId});
+    console.log("UserId in get public quizzes: ", userId)
+    const user = await AdminUser.findById();
+    console.log("User n get public quizzes:", user)
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }
