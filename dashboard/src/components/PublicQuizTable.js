@@ -78,27 +78,35 @@ const PublicQuizTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {quizData.map((quiz, index) => (
-            <StyledTableRow key={quiz.index}>
-              <StyledTableCell component="th" scope="row">
-                {quiz.title}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                {quiz.description}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                {quiz.creatorUserName}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                {quiz.numberOfParticipants}
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                <Button variant="outlined" color="primary">
-                  Play
-                </Button>
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
+        {quizData.length > 0 ? (
+              quizData.map((quiz, index) => (
+                <StyledTableRow key={index}>
+                  <StyledTableCell component="th" scope="row">
+                    {quiz.title}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {quiz.description}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {quiz.creatorUserName}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    {quiz.numberOfParticipants}
+                  </StyledTableCell>
+                  <StyledTableCell align="right">
+                    <Button variant="outlined" color="primary">
+                      Play
+                    </Button>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            ) : (
+              <StyledTableRow>
+                <StyledTableCell colSpan={5} align="center">
+                  No public quiz is available
+                </StyledTableCell>
+              </StyledTableRow>
+            )}
         </TableBody>
       </Table>
     </TableContainer>

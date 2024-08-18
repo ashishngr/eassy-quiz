@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import { IconButton, Menu, MenuItem, Button} from "@mui/material";
+import { IconButton, Menu, MenuItem, Button, Snackbar, Alert} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayQuiz from "./PlayQuiz"; 
+
+import API from '../common/apis';
+
 
 const ThreeDotDropdown = ({quizId}) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const navigate = useNavigate();
 
@@ -17,12 +23,32 @@ const ThreeDotDropdown = ({quizId}) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const handlePlayClick = () => {
     // Handle play action
     console.log("Quiz ID in handlePlayClick:", quizId);
     handleClose();
   };
+
+  const handleSave = async() =>{
+    try {
+      const response = await API.saveQuizToLibrary({ quizId });
+      console.log("message response" ,response);
+      const message = response?.data.message
+      setSnackbarMessage(message);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Failed to save quiz:", error);
+      setSnackbarMessage("Failed to save quiz.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+    handleClose();
+  }
 
   const handleViewClick = () => {
     // Handle view action
@@ -46,8 +72,10 @@ const ThreeDotDropdown = ({quizId}) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={handlePlayClick}>
-            <PlayQuiz quizId={quizId}/>
+        <MenuItem onClick={handleSave}>
+        <Button variant="contained" color="primary">
+            Save
+          </Button>
         </MenuItem>
         <MenuItem onClick={handleViewClick}>
           <Button variant="contained" color="primary">
@@ -55,6 +83,17 @@ const ThreeDotDropdown = ({quizId}) => {
           </Button>
         </MenuItem>
       </Menu>
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

@@ -64,9 +64,7 @@ const API = {
     publicQuiz : async() =>{
       return await axios.get(`${API_BASE_URL}/api/v1/public`, getHeadersWithToken())
     }, 
-    getSavedQuizzes : async() =>{
-      return await axios.get(`${API_BASE_URL}/api/v1/saved`, getHeadersWithToken())
-    },
+   
     topTenQuiz : async () =>{
       return await axios.get(`${API_BASE_URL}/api/v1/latesQuiz`, getHeadersWithToken()); 
     }, 
@@ -75,6 +73,14 @@ const API = {
     }, 
     getQuizDetails : async(quizId) => { 
       return await axios.get(`${API_BASE_URL}/api/v1/quiz/${quizId}`, getHeadersWithToken())
+    }, 
+    getSaveQuizes : async() =>{
+      return await axios.get(`${API_BASE_URL}/api/v1/save-quizes`, getHeadersWithToken())
+    }, 
+    saveQuizToLibrary : async(payload) => {
+      let data = payload; 
+      console.log("Data", data.quizId)
+      return await axios.post(`${API_BASE_URL}/api/v1/save`, data, getHeadersWithToken())
     }
   };
 export default API; 

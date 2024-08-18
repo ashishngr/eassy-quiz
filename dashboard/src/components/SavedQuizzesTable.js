@@ -11,20 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import API from "../common/apis";
+
 
 const SavedQuizzesTable = ({ quizzes }) => {
-  const [quiz, setQuiz] = useState([]);
 
-  const getSavedQuizzes = async () => {
-    await API.getSavedQuizzes().then((response) => {
-      let data = response?.data.data || [];
-      console.log("data save", data);
-    });
-  };
-  useEffect(() => {
-    getSavedQuizzes();
-  }, []);
+// Check if quizzes is an array and if it has any quizzes
+const hasQuizzes = Array.isArray(quizzes) && quizzes.length > 0;
+  
   return (
     <div>
       <Typography variant="h5" component="h2" gutterBottom>
@@ -37,26 +30,37 @@ const SavedQuizzesTable = ({ quizzes }) => {
         <Table sx={{ minWidth: 450 }} aria-label="saved quizzes table">
           <TableHead>
             <TableRow>
+            <TableCell>Id</TableCell>
               <TableCell>Title</TableCell>
-              <TableCell>Creator</TableCell>
+              <TableCell>Creator User Name</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {quizzes.map((quiz) => (
-              <TableRow key={quiz.id}>
-                <TableCell>{quiz.title}</TableCell>
-                <TableCell>{quiz.creator}</TableCell>
-                <TableCell>
-                  <Button variant="outlined" color="primary">
-                    View
-                  </Button>
-                  <Button variant="outlined" color="secondary">
-                    Play
-                  </Button>
+          {hasQuizzes ? (
+              quizzes.map((quiz) => (
+                <TableRow key={quiz.id}>
+                  <TableCell>{quiz.id}</TableCell>
+                  <TableCell>{quiz.title}</TableCell>
+                  <TableCell>{quiz.creatorUserName}</TableCell>
+                  <TableCell>
+                    <Button variant="outlined" color="primary">
+                      View
+                    </Button>
+                    <Button variant="outlined" color="secondary">
+                      Play
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              // Display this row if there are no quizzes
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  No saved quizzes found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

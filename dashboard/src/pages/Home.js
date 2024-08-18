@@ -6,25 +6,30 @@ import HomePageQuizCard from '../components/HomePageQuizCard';
 import PublicQuizTable from '../components/PublicQuizTable';
 import SavedQuizzesTable from '../components/SavedQuizzesTable'; 
 import LatesQuizTable from '../components/LatesQuizTable'; 
+import {useNavigate} from 'react-router-dom';
 
 import API from '../common/apis';
 
 const Home = () => {
-  const quizzes = [
-    { id: 1, title: 'Math Quiz', creator: 'John Doe' },
-    { id: 2, title: 'Science Quiz', creator: 'Jane Smith' },
-    { id: 3, title: 'History Quiz', creator: 'Michael Johnson' },
-    { id: 4, title: 'Geography Quiz', creator: 'Emily Davis' },
-    { id: 5, title: 'Literature Quiz', creator: 'Robert Brown' },
-    { id: 6, title: 'Math Quiz', creator: 'John Doe' },
-    { id: 7, title: 'Science Quiz', creator: 'Jane Smith' },
-    { id: 8, title: 'History Quiz', creator: 'Michael Johnson' },
-    { id: 9, title: 'Geography Quiz', creator: 'Emily Davis' },
-    { id: 10, title: 'Literature Quiz', creator: 'Robert Brown' },
-  ];
+  // const quizzes = [
+  //   { id: 1, title: 'Math Quiz', creator: 'John Doe' },
+  //   { id: 2, title: 'Science Quiz', creator: 'Jane Smith' },
+  //   { id: 3, title: 'History Quiz', creator: 'Michael Johnson' },
+  //   { id: 4, title: 'Geography Quiz', creator: 'Emily Davis' },
+  //   { id: 5, title: 'Literature Quiz', creator: 'Robert Brown' },
+  //   { id: 6, title: 'Math Quiz', creator: 'John Doe' },
+  //   { id: 7, title: 'Science Quiz', creator: 'Jane Smith' },
+  //   { id: 8, title: 'History Quiz', creator: 'Michael Johnson' },
+  //   { id: 9, title: 'Geography Quiz', creator: 'Emily Davis' },
+  //   { id: 10, title: 'Literature Quiz', creator: 'Robert Brown' },
+  // ];
   const [quizCreated, setQuizCreated ] = useState(0); 
   const [quizzesParticipated, setQuizzesParticipated] = useState(0); 
   const [numUniqueParticipants, setNumUniqueParticipants] = useState(0); 
+  const [quizes, setQuizes] = useState([])
+
+  const navigate = useNavigate();  
+
 
 
   const fetchQuizSatat = async() =>{
@@ -34,9 +39,26 @@ const Home = () => {
     setQuizzesParticipated(response?.data.quizzesParticipated)
     console.log("Quiz Stat", response);
   }
+
+  const fetchSavedQuizes = async() =>{
+    const response = await API.getSaveQuizes(); 
+    console.log("Response", response)
+    let data = response?.data 
+    setQuizes(data)
+  }
+
+
   useEffect(()=>{
     fetchQuizSatat()
+  },[]);  
+
+  useEffect(()=>{
+    fetchSavedQuizes()
   },[])
+  const handleCreateQuiz = (event) =>{
+    event.preventDefault();
+    navigate('/admin/dashboard/quiz/create')
+  }
   return (
     <div>
       <div className='flex flex-row justify-between'>
@@ -68,10 +90,7 @@ const Home = () => {
           textTransform: 'none',
         }}
         startIcon={<AddIcon sx={{ fontSize: '3rem' }} />}
-        onClick={() => {
-          // Add your navigation or functionality for creating a quiz here
-          alert('Navigate to Create Quiz page');
-        }}
+        onClick={(event)=>handleCreateQuiz(event)}
         >
         Create Quiz
         </Button>
@@ -81,7 +100,7 @@ const Home = () => {
       {/* Two tables  - Public qiz table [most popular] || - Saved quiz [] */}
       <div className='flex flex-row mt-12 space-x-8'> 
         <PublicQuizTable />
-        <SavedQuizzesTable quizzes={quizzes}/>
+        <SavedQuizzesTable quizzes={quizes}/>
       </div>
       <div>
         <Typography variant="h5" component="h2" gutterBottom >
