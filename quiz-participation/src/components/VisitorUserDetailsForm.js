@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, Grid, Box } from '@mui/material';
 import {useNavigate, useLocation} from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+
+import {jwtDecode} from 'jwt-decode';
+
 import axios from 'axios';
 
 
@@ -39,9 +42,8 @@ const VisitorUserDetailsForm = () => {
         });
       }; 
       useEffect(()=>{
-
-      },[])
-      const handleSubmit = async(e) => {
+    },[])
+    const handleSubmit = async(e) => {
         e.preventDefault();
         console.log('Form Data:', formData);
         // Proceed to next step 
@@ -53,8 +55,18 @@ const VisitorUserDetailsForm = () => {
           occupation : formData.occupation, 
           quizId : quizId
         })
-        console.log("Response of visitor user basic details", response.data)
+        console.log("Response of visitor user basic details", response.data) 
+        
         if(response.status == 201){
+         
+          // Decode the token to extract visitorUserId
+          const { token } = response.data;
+          const decodedToken = jwtDecode(token);
+          const visitorUserId = decodedToken.visitorUserId; 
+          console.log("v.user.id", visitorUserId)
+          // Save the token and visitorUserId to local storage
+          localStorage.setItem('visitorToken', token);
+          localStorage.setItem('visitorUserId', visitorUserId);
           navigate(`/quiz/play/quiz/${quizId}`); 
         }
       };

@@ -141,55 +141,62 @@ const handlePreviousQuestion = () => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setTimer(40);
     } else {
-      navigateToSummary();
+      let id = localStorage.getItem("visitorUserId")
+      navigateToSummary(id);
     }
   };
 
   // Handle skip to end functionality
   const handleSkipToEnd = async() => {
     const remainingQuestions = questions.slice(currentQuestionIndex);
-    console.log("Skip to end: ", remainingQuestions);
-
-
     // Capture results for remaining questions as unanswered
-    const skippedResults = remainingQuestions.map((question, index) => ({
-      text: question.text,
-      userSubmittedOption: "Skipped",
-      correctOption: correctOptions[currentQuestionIndex + index],
-      points: 0,
-    }));
-
-    // setSelectedOptions((prev) => [...prev, ...skippedResults]);
-    // navigateToSummary(); 
+    let skippedResults = [];
+    if (remainingQuestions.length > 0) {
+        skippedResults = remainingQuestions.map((question, index) => ({
+            text: question.text,
+            userSubmittedOption: "Skipped",
+            correctOption: correctOptions[currentQuestionIndex + index],
+            points: 0,
+        }));
+    }
+    // Combine previously selected options with skipped results
     const finalResults = [...selectedOptions, ...skippedResults];
     setSelectedOptions(finalResults); 
-
-    console.log("Final Result", finalResults); 
-
-
-     // Determine if the quiz is complete
-     const isComplete = finalResults.length === questions.length;
-
+    // Determine if the quiz is complete
+    const isComplete = finalResults.length === questions.length; 
+    // Extract participantId from local storage
+    const participantId = localStorage.getItem('visitorUserId'); 
+    // Calculate final score
+    const finalScore = finalResults.reduce((total, result) => total + result.points, 0); 
+     // Determine right, wrong, and skipped questions
+     const rightQuestions = finalResults.filter(result => result.points > 0).length;
+     const wrongQuestions = finalResults.filter(result => result.points === 0 && result.userSubmittedOption !== "Skipped").length;
+    const skipedQuestions = finalResults.filter(result => result.userSubmittedOption === "Skipped").length;
     try {
       // API call to save quiz participation data to the database
-      await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
-        quizId,                       // Quiz ID
-        isComplete: isComplete,            // Quiz not fully completed by user
-        questions: finalResults, 
-        
+      const response = await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
+            quizId,                       // Quiz ID
+            participantId,                // Participant ID
+            isComplete: isComplete,       // Quiz completion status
+            finalScore,                   // Final score
+            rightQuestions,               // List of right question numbers
+            wrongQuestions,               // List of wrong question numbers
+            skipedQuestions,             // List of skipped question numbers
+            questions: finalResults,      // Full quiz results 
       });
-  
+      const id = response.data.puizParticipationId; 
+      localStorage.setItem('participationId', id );
+
       // Navigate to the summary page after successful save
-      navigateToSummary();
+      navigateToSummary(id);
     } catch (error) {
       console.error("Error saving quiz participation data:", error);
       // Optionally handle errors, e.g., show an error message to the user
     }
-
   };
 
   // Navigate to summary page
-  const navigateToSummary = () => {
+  const navigateToSummary = (id) => {
     // Added logic to handle unanswered last question
     if (!selectedOptions[currentQuestionIndex]) {
       const unansweredResult = {
@@ -202,8 +209,7 @@ const handlePreviousQuestion = () => {
       newSelectedOptions[currentQuestionIndex] = unansweredResult;
       setSelectedOptions(newSelectedOptions);
     }
-    console.log("Final Results:", selectedOptions);
-    navigate("/quiz/summary", { state: { results: selectedOptions } });
+    navigate(`/quiz/summary/${id}`, { state: { results: selectedOptions } });
   };
 
   if (loading) return <p>Loading...</p>;
