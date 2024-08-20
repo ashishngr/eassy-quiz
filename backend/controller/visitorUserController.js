@@ -5,7 +5,7 @@ const {QuizParticipation} = require("../models/quizParticipationSchema")
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY; 
 
-
+const {ERRORS} = require("../constants"); 
 const ErrorUtils = require("../utils/errorUtils"); 
  
 const VisitorUserController = module.exports; 
@@ -54,19 +54,28 @@ VisitorUserController.getQuizInformation = async(req, res) => {
     }
 }
 VisitorUserController.quizParticipation = async(req, res) =>{
-    const {quizId, questions, isComplete } = req.body; 
+   
+
+    const {quizId, participantId, questions, isComplete, finalScore, rightQuestions, wrongQuestions, skipedQuestions } = req.body;  
     // Validate input
-    if (!quizId || !questions || isComplete === undefined) {
+    if (!quizId || !participantId || !finalScore ||!rightQuestions || !wrongQuestions || !skipedQuestions || !questions || isComplete === undefined) {
         return ErrorUtils.APIErrorResponse(res, ERRORS.GENERIC_BAD_REQUEST);
     }
     try {
         const newQuizParticipation = new QuizParticipation({
             quizId,
+            participantId,
             questions,
             isComplete, 
+            finalScore,
+            rightQuestions, 
+            wrongQuestions, 
+            skipedQuestions 
         });
         await newQuizParticipation.save();
-        res.status(200).json({ message: 'Quiz Participation created successfully'});
+        res.status(200).json({ message: 'Quiz Participation created successfully', 
+            puizParticipationId : newQuizParticipation.id
+        }); 
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);

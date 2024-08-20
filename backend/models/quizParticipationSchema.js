@@ -7,6 +7,11 @@ const quizParticipationSchema = new mongoose.Schema({
         ref: 'Quiz',
         required: true
     },
+    participantId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Quiz',
+        required: true
+    },
     questions: [
         {
           text: { type: String, required: true },
@@ -18,6 +23,22 @@ const quizParticipationSchema = new mongoose.Schema({
     isComplete: {
         type: Boolean,
         required: true,
+    },
+    finalScore : {
+        type: Number, 
+        required: true
+    }, 
+    rightQuestions: {
+        type: Number, 
+        required: true, 
+    }, 
+    wrongQuestions: {
+        type: Number, 
+        require: true
+    }, 
+    skipedQuestions: {
+        type : Number, 
+        required: true
     }
 },
 {

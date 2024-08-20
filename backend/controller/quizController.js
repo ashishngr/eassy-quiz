@@ -335,7 +335,7 @@ QuizController.getSaveQuizes = async(req, res) =>{
 QuizController.getPublicQuizzes = async(req, res) =>{
     const userId = req.user.id; 
     console.log("UserId in get public quizzes: ", userId)
-    const user = await AdminUser.findById();
+    const user = await AdminUser.findById(userId);
     console.log("User n get public quizzes:", user)
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
@@ -349,6 +349,7 @@ QuizController.getPublicQuizzes = async(req, res) =>{
         const shuffledQuizzes = PublicQuizzes.sort(() => 0.5 - Math.random()); 
         const topTenQuizzes = shuffledQuizzes.slice(0, 10); 
         const response = topTenQuizzes.map(quiz => ({
+            id: quiz._id,
             title: quiz.title,
             description: quiz.description,
             creatorUserName: quiz.creatorUserName,
