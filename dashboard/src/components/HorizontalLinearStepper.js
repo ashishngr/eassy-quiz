@@ -9,6 +9,8 @@ import Typography from "@mui/material/Typography";
 import QuizIntroForm from "./QuizIntroForm";
 import QuestionForm from "./QuestionForm";
 import StorageUtils from "../utils/storage_utils";
+import { useNavigate } from 'react-router-dom';
+
 
 import API from "../common/apis";
 
@@ -31,6 +33,9 @@ export default function HorizontalLinearStepper() {
     isDraft: "isDraft",
     scope: "",
   });
+
+  const navigate = useNavigate();
+
 
   const handleInputChange = (index, field, value) => {
     const updatedQuestions = [...questions];
@@ -75,9 +80,7 @@ export default function HorizontalLinearStepper() {
         if (response.status === 200) {
           const Id = response.data.payload.data._id;
           console.log("---->", response.data.payload.data._id);
-
           setQuizId(Id);
-
           setActiveStep((prevActiveStep) => prevActiveStep + 1);
         } else {
           // Handle unexpected status codes
@@ -99,6 +102,10 @@ export default function HorizontalLinearStepper() {
     console.log("--Quiz--Id", quizId);
     const questionsData = payload.questions;
     const response = await API.addQuestions(payload, quizId);
+    console.log("Response after creating quiz", response)
+    if(response.status === 201){
+      navigate("/admin/dashboard/quiz")
+    }
 
     // Combine intro data and questions data and save the quiz
     // Log the quiz data to console

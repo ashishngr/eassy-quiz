@@ -100,7 +100,7 @@ const Home = () => {
       {/* Two tables  - Public qiz table [most popular] || - Saved quiz [] */}
       <div className='flex flex-row mt-12 space-x-8'> 
         <PublicQuizTable />
-        <SavedQuizzesTable quizzes={quizes}/>
+        <SavedQuizzesTable quizzes={quizes.data}/>
       </div>
       <div>
         <Typography variant="h5" component="h2" gutterBottom >

@@ -9,6 +9,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Typography, Button } from "@mui/material";
 
+import ThreeDotDropdown from "./ThreeDotDropdown";
 import API from "../common/apis";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -54,6 +55,7 @@ const PublicQuizTable = () => {
       .then((response) => {
         let data = response?.data.data || [];
         setQuizData(data);
+        console.log("Public quiz", data)
       })
       .catch((error) => {
         console.log("Error in fetching public quizzes", error);
@@ -94,9 +96,7 @@ const PublicQuizTable = () => {
                     {quiz.numberOfParticipants}
                   </StyledTableCell>
                   <StyledTableCell align="right">
-                    <Button variant="outlined" color="primary">
-                      Play
-                    </Button>
+                    <ThreeDotDropdown quizId={quiz.id}/>
                   </StyledTableCell>
                 </StyledTableRow>
               ))
