@@ -17,7 +17,7 @@ function VisitorRoutesWrapper(){
             <Route path='/visitor-user-details/:quizId' element={<VisitorUserDetailPage />}/>
             <Route path='/play/quiz/:quizId' element={<QuizPage />} />
             <Route path='/summary/:id' element={<SummaryPage />}/>
-            <Route path='/feedback/:id' element={<FeedbackPage />}/>
+            <Route path='/feedback/:participationId' element={<FeedbackPage />}/>
 
         </Routes>
     )

@@ -4,12 +4,28 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Button from '@mui/material/Button';
 import {  useNavigate } from "react-router-dom";
 
+import axios from "axios"; 
+
+const participationId = localStorage.getItem("participationId"); 
+console.log("Id on summary page", participationId)
 const SummaryPage = () => { 
+
+  const [summaryData, setSummaryData] = useState()
+
   const navigate = useNavigate();
+
   const handleEndQuiz = () =>{
-    const id = localStorage.getItem("visitorUserId"); 
-    navigate(`/quiz/feedback/${id}`)
+    localStorage.clear();
+    navigate(`/quiz/feedback/${participationId}`)
   }
+  const fetchQuizSummary = async() =>{
+    console.log("quiz participation id", participationId)
+    const response = await axios.get(`http://localhost:8080/api/v1/quiz/summary/${participationId}`); 
+    setSummaryData(response?.data)
+  }; 
+  useEffect(()=>{
+    fetchQuizSummary()
+  },[])
   return (
     <Box
     sx={{
@@ -40,21 +56,21 @@ const SummaryPage = () => {
       </Typography>
 
       <Typography variant="h5" color="primary" gutterBottom>
-        Final Score: 3
+        Final Score: {summaryData?.finalScore}
       </Typography>
 
       <Typography variant="body1" gutterBottom>
-        Right Answers: 3
+        Right Answers: {summaryData?.rightQuestions}
       </Typography>
 
       <Typography variant="body1" gutterBottom>
-        Wrong Answers: 1
+        Wrong Answers: {summaryData?.wrongQuestions}
       </Typography>
 
       <Typography variant="body1" gutterBottom>
-        Skipped Questions: 1
+        Skipped Questions: {summaryData?.skipedQuestions - 1} 
       </Typography>
-      <Button variant="contained" size="large" color="error" onClick={handleEndQuiz}>
+      <Button variant="contained" size="large" color="error" onClick={()=> handleEndQuiz(summaryData?.quizParticipationId)}>
         End Quiz
       </Button>
     </Paper>

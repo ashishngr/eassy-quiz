@@ -1,22 +1,25 @@
 import React, { useState } from 'react'
 import { Box, Card, Typography, Radio, RadioGroup, FormControlLabel, TextField, Button } from "@mui/material";
+import axios from "axios"; 
+import { useParams } from "react-router-dom";
+
 
 const FeedbackPage = () => { 
-const [feedback, setFeedback] = useState("");
+
 const [rating, setRating] = useState(""); 
 
-const handleFeedbackChange = (event) => {
-    setFeedback(event.target.value);
-};
+const {participationId} = useParams();
+console.log("participationId", participationId)
+
 
 const handleRatingChange = (event) => {
     setRating(event.target.value);
 };
-const handleSubmit = (event) => {
+const handleSubmit = async(event) => {
     event.preventDefault();
     // Handle the form submission logic here, e.g., send the feedback to the server
-    console.log("Feedback:", feedback);
-    console.log("Rating:", rating);
+    console.log("Rating:", rating); 
+    const response = await axios.post(`http://localhost:8080/api/v1/quiz-feedback/${participationId}`, {feedback : rating}); 
 };
 
 return (
@@ -55,16 +58,6 @@ return (
           <FormControlLabel value="Excellent" control={<Radio />} label="Excellent" />
           <FormControlLabel value="Average" control={<Radio />} label="Average" />
         </RadioGroup>
-        <TextField
-          label="Your Feedback"
-          multiline
-          rows={4}
-          fullWidth
-          variant="outlined"
-          value={feedback}
-          onChange={handleFeedbackChange}
-          sx={{ marginBottom: "20px" }}
-        />
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Submit
         </Button>
