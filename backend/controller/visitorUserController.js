@@ -1,4 +1,6 @@
 const express = require('express'); 
+const mongoose = require("mongoose"); 
+
 const {Quiz} = require("../models/quizSchema"); 
 const {VisitorUser} = require("../models/visitorUserSchema"); 
 const {QuizParticipation} = require("../models/quizParticipationSchema")
@@ -79,5 +81,65 @@ VisitorUserController.quizParticipation = async(req, res) =>{
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
+    }
+}
+VisitorUserController.getQuizSummary = async(req, res) =>{
+    const { participationId } = req.params;
+    try {
+         // Convert participationId to ObjectId
+         const id = mongoose.Types.ObjectId.isValid(participationId) ? new mongoose.Types.ObjectId(participationId) : null;
+
+         if (!id) {
+             return res.status(400).json({ message: 'Invalid participation ID format' });
+         }
+        // Find the quiz participation by ID
+        const quizParticipation = await QuizParticipation.findById(participationId); 
+        console.log("Quiz Participation Data :::::::::", quizParticipation);
+
+        
+        if (!quizParticipation) {
+            return res.status(404).json({ message: 'Quiz participation not found' });
+        }
+        
+
+        // Send the response with the quizParticipationId and other details
+        res.status(200).json({
+            quizParticipationId: quizParticipation._id,
+            quizId: quizParticipation.quizId,
+            participantId: quizParticipation.participantId,
+            isComplete: quizParticipation.isComplete,
+            finalScore: quizParticipation.finalScore,
+            rightQuestions: quizParticipation.rightQuestions,
+            wrongQuestions: quizParticipation.wrongQuestions,
+            skipedQuestions: quizParticipation.skipedQuestions,
+            questions: quizParticipation.questions,
+        });
+    } catch (error) {
+        console.log('Error fetching quiz participation:', error); 
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+VisitorUserController.addfeedback = async(req, res) =>{
+    const { participationId } = req.params;
+    const { feedback } = req.body;
+    if (!feedback) {
+        return res.status(400).json({ message: 'Feedback is required' });
+    }
+    try {
+        // Find the quiz participation by ID and ensure feedback hasn't already been submitted
+        const quizParticipation = await QuizParticipation.findById(participationId);
+        if (!quizParticipation) {
+            return res.status(404).json({ message: 'Quiz participation not found' });
+        }
+        if (quizParticipation.feedback) {
+            return res.status(400).json({ message: 'Feedback has already been submitted for this participation' });
+        }
+        // Update the participation with the feedback
+        quizParticipation.feedback = feedback;
+        await quizParticipation.save();
+        return res.status(200).json({ message: 'Feedback submitted successfully' });
+    } catch (error) {
+        console.log('Error fetching quiz participation:', error); 
+        return res.status(500).json({ message: 'Internal server error' });
     }
 }

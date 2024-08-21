@@ -39,6 +39,10 @@ const quizParticipationSchema = new mongoose.Schema({
     skipedQuestions: {
         type : Number, 
         required: true
+    },
+    feedback: {
+        type: String,
+        required: false,
     }
 },
 {

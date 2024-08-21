@@ -82,5 +82,5 @@ exports.ERRORS = {
     ACCESS_DENIED : {
         status_code: 403, 
         message: "Access Denied"
-    }
+    }, 
 }
