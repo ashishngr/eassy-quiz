@@ -4,13 +4,17 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Button from '@mui/material/Button';
 import {  useNavigate } from "react-router-dom";
 
+
 import axios from "axios"; 
 
-const participationId = localStorage.getItem("participationId"); 
-console.log("Id on summary page", participationId)
+
 const SummaryPage = () => { 
 
   const [summaryData, setSummaryData] = useState()
+
+
+  const participationId = localStorage.getItem("participationId"); 
+  console.log("Id on summary page", participationId)
 
   const navigate = useNavigate();
 
@@ -21,11 +25,11 @@ const SummaryPage = () => {
   const fetchQuizSummary = async() =>{
     console.log("quiz participation id", participationId)
     const response = await axios.get(`http://localhost:8080/api/v1/quiz/summary/${participationId}`); 
-    setSummaryData(response?.data)
+    setSummaryData(response?.data || [])
   }; 
   useEffect(()=>{
     fetchQuizSummary()
-  },[])
+  },[participationId])
   return (
     <Box
     sx={{
