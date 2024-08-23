@@ -5,6 +5,7 @@ import { Typography, Button, Paper, SvgIcon } from '@mui/material';
 import QuizIcon from '@mui/icons-material/Quiz';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 
 import ErrorPage from './ErrorPage';
 
@@ -14,7 +15,9 @@ const LandingPage = () => {
  const [quizId, setQuizId] = useState("");
   const location = useLocation();
   
-  const navigate = useNavigate();   
+  const navigate = useNavigate(); 
+  
+
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
@@ -28,6 +31,10 @@ const LandingPage = () => {
         if (response.data.valid) {
           setIsValidToken(true);
           setQuizId(response.data.quizId); 
+          const decodedToken = jwtDecode(token);
+
+          const creatorUserId = decodedToken.creatorUserId; 
+          localStorage.setItem('creatorUserId', creatorUserId); 
         } else {
           setIsValidToken(false);
         }

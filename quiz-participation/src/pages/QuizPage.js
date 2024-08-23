@@ -165,7 +165,8 @@ const handlePreviousQuestion = () => {
     // Determine if the quiz is complete
     const isComplete = finalResults.length === questions.length; 
     // Extract participantId from local storage
-    const participantId = localStorage.getItem('visitorUserId'); 
+    const participantId = localStorage.getItem('visitorUserId');
+    const creatorUserId = localStorage.getItem('creatorUserId');  
     // Calculate final score
     const finalScore = finalResults.reduce((total, result) => total + result.points, 0); 
      // Determine right, wrong, and skipped questions
@@ -176,7 +177,8 @@ const handlePreviousQuestion = () => {
       // API call to save quiz participation data to the database
       const response = await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
             quizId,                       // Quiz ID
-            participantId,                // Participant ID
+            participantId,   
+            creatorUserId,          // Participant ID
             isComplete: isComplete,       // Quiz completion status
             finalScore,                   // Final score
             rightQuestions,               // List of right question numbers

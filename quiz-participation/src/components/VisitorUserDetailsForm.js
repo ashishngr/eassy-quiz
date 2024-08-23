@@ -23,7 +23,10 @@ const VisitorUserDetailsForm = () => {
     const navigate = useNavigate(); 
     const location = useLocation();
     const { quizId } = useParams();
-    console.log("QuizId:", quizId);
+    console.log("QuizId:", quizId); 
+
+    const quizCreatorId = localStorage.getItem("creatorUserId"); 
+    console.log("quiz creator Id", quizCreatorId)
 
     useEffect(() => {
       // Corrected log statement
@@ -53,7 +56,9 @@ const VisitorUserDetailsForm = () => {
           phoneNumber : formData.phoneNumber, 
           dob : formData.dob, 
           occupation : formData.occupation, 
-          quizId : quizId
+          quizId : quizId, 
+          quizCreatorId : quizCreatorId
+           
         })
         console.log("Response of visitor user basic details", response.data) 
         
