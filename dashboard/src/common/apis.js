@@ -81,6 +81,10 @@ const API = {
       let data = payload; 
       console.log("Data", data.quizId)
       return await axios.post(`${API_BASE_URL}/api/v1/save`, data, getHeadersWithToken())
+    }, 
+    getQuizParticipationRating : async(payload) =>{
+      let filter = payload; 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-feedback?timestamp=${filter}`, getHeadersWithToken())
     }
   };
 export default API; 
