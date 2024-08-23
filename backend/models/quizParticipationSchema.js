@@ -12,6 +12,11 @@ const quizParticipationSchema = new mongoose.Schema({
         ref: 'Quiz',
         required: true
     },
+    creatorUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Quiz',
+        required: true
+    },
     questions: [
         {
           text: { type: String, required: true },

@@ -3,9 +3,10 @@ const {ERRORS} = require('../constants');
 
 const QuizLinkHelper = module.exports; 
 
-QuizLinkHelper.generateToken = (quizId) => {
+QuizLinkHelper.generateToken = (quizId, creatorUserId) => {
     const payload = {
         quizId,
+        creatorUserId, 
         createdAt: new Date().toISOString(),
       };
       const token = jwt.sign(payload,  process.env.SECRET_KEY, { expiresIn: '1h' }); // Token expires in 1 hour

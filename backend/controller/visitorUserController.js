@@ -13,8 +13,8 @@ const ErrorUtils = require("../utils/errorUtils");
 const VisitorUserController = module.exports; 
 
 VisitorUserController.saveVisitorUserDetails = async(req, res) =>{
-    const { name, email, phoneNumber, dob, occupation, quizId } = req.body;
-    if (!name || !email || !phoneNumber || !dob || !occupation || !quizId) {
+    const { name, email, phoneNumber, dob, occupation, quizId, quizCreatorId } = req.body;
+    if (!name || !email || !phoneNumber || !dob || !occupation || !quizId || !quizCreatorId) {
         return res.status(400).json({ message: 'All fields are required' });
     }
     try {
@@ -24,7 +24,8 @@ VisitorUserController.saveVisitorUserDetails = async(req, res) =>{
             phoneNumber,
             dob,
             occupation,
-            quizId
+            quizId, 
+            quizCreatorId
         });
         await visitorUser.save();
         const token = jwt.sign({ visitorUserId: visitorUser._id, quizId }, SECRET_KEY, {
@@ -58,9 +59,9 @@ VisitorUserController.getQuizInformation = async(req, res) => {
 VisitorUserController.quizParticipation = async(req, res) =>{
    
 
-    const {quizId, participantId, questions, isComplete, finalScore, rightQuestions, wrongQuestions, skipedQuestions } = req.body;  
+    const {quizId, participantId, questions, isComplete, finalScore, rightQuestions, wrongQuestions, skipedQuestions,  creatorUserId} = req.body;  
     // Validate input
-    if (!quizId || !participantId || !finalScore ||!rightQuestions || !wrongQuestions || !skipedQuestions || !questions || isComplete === undefined) {
+    if (!quizId || !participantId || !finalScore ||!rightQuestions || !wrongQuestions || !skipedQuestions || !questions || isComplete === undefined || !creatorUserId) {
         return ErrorUtils.APIErrorResponse(res, ERRORS.GENERIC_BAD_REQUEST);
     }
     try {
@@ -72,7 +73,8 @@ VisitorUserController.quizParticipation = async(req, res) =>{
             finalScore,
             rightQuestions, 
             wrongQuestions, 
-            skipedQuestions 
+            skipedQuestions, 
+            creatorUserId
         });
         await newQuizParticipation.save();
         res.status(200).json({ message: 'Quiz Participation created successfully', 

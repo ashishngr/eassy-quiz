@@ -496,7 +496,7 @@ QuizController.generatePrivateQuizLink = async(req, res) =>{
         if ( quiz.creatorUserEmail === userEmail) {
             // Generate a secure token
             // const token = generateSecureToken(quizId); // Implement this function 
-            const token  = QuizLinkHelper.generateToken(quizId); 
+            const token  = QuizLinkHelper.generateToken(quizId, user._id); 
             // Send the token in the response
             res.status(200).json({ link: `http://localhost:3001/quiz/landing-page?token=${token}` });
         } else {
@@ -509,7 +509,7 @@ QuizController.generatePrivateQuizLink = async(req, res) =>{
 };
 
 QuizController.validateQuizToken = async(req, res) =>{
-    const { token } = req.query; 
+    const { token } = req.query;  
 
     console.log("token to validate", token) 
 
@@ -522,7 +522,7 @@ QuizController.validateQuizToken = async(req, res) =>{
     const decoded = jwt.verify(token,  process.env.SECRET_KEY);
     const quizId = decoded.quizId; // Assuming the token contains quizId
 
-    return res.status(200).json({ valid: true, message: 'Token is valid', quizId });
+    return res.status(200).json({ valid: true, message: 'Token is valid', quizId, token });
   } catch (error) {
     console.error('Error validating token:', error);
     return res.status(401).json({ valid: false, message: 'Invalid or expired token' });
