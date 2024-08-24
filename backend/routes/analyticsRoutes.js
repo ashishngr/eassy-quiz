@@ -11,4 +11,8 @@ router.get("/quiz-completion", validateToken, AnalyticsController.getQuizComplet
 router.get("/quiz-participant", validateToken, AnalyticsController.getParticipationData); 
 router.get("/quiz-scope", validateToken, AnalyticsController.getQuizScopeData)
 router.get("/quiz-count", validateToken, AnalyticsController.QuizData)
+router.get("/quiz-attendee-count", validateToken, AnalyticsController.QuizAtendeeCount); 
+router.get("/quiz-attendee-rating", validateToken, AnalyticsController.QuizAttendeesRating); 
+router.get("/quizs-play-status", validateToken, AnalyticsController.quizComplete); 
+
 module.exports = router; 

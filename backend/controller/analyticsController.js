@@ -11,16 +11,12 @@ const AnalyticsController = module.exports;
 
 const {ERRORS} = require("../constants"); 
 const ErrorUtils = require("../utils/errorUtils"); 
-const { use } = require('../routes/analyticsRoutes');
+
 
 
 AnalyticsController.getFeedbackDetails = async(req, res) =>{
     try {
-        const { timestamp } = req.query;
-        console.log("timeStamp: ", timestamp)
-        console.log("type of timestamp: ", typeof(timestamp));
-
-        
+        const { timestamp } = req.query;        
         let today = new Date(); 
         let yesterday = new Date(today); 
         let oneWeek = new Date(today); 
@@ -47,9 +43,7 @@ AnalyticsController.getFeedbackDetails = async(req, res) =>{
 
 
         const userId = req.user.id; 
-        console.log("creator user id : ", userId)
         const user = await AdminUser.findById({_id : userId}); 
-        console.log("Creator User", user)
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
@@ -109,7 +103,6 @@ AnalyticsController.getFeedbackDetails = async(req, res) =>{
         if(timestamp && timestamp === 'allTime'){
             query = {...query, }
         }
-        console.log("query", query)
 
         const list = await QuizParticipation.aggregate([
            { $match : query}, 
@@ -137,8 +130,6 @@ AnalyticsController.getFeedbackDetails = async(req, res) =>{
 AnalyticsController.getQuizCompletionData = async(req, res) =>{
     try {
     const { timestamp } = req.query;
-    console.log("timeStamp: ", timestamp)
-    console.log("type of timestamp: ", typeof(timestamp));
     let today = new Date(); 
     let yesterday = new Date(today); 
     let oneWeek = new Date(today); 
@@ -165,9 +156,7 @@ AnalyticsController.getQuizCompletionData = async(req, res) =>{
 
 
     const userId = req.user.id; 
-    console.log("creator user id : ", userId)
     const user = await AdminUser.findById({_id : userId}); 
-    console.log("Creator User", user)
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }; 
@@ -227,7 +216,6 @@ AnalyticsController.getQuizCompletionData = async(req, res) =>{
     if(timestamp && timestamp === 'allTime'){
         query = {...query, }
     }
-    console.log("query", query); 
     const list = await QuizParticipation.aggregate([
         { $match : query}, 
         {
@@ -357,10 +345,6 @@ AnalyticsController.QuizData = async(req, res) =>{
 AnalyticsController.getQuizScopeData = async(req, res) =>{
     try {
         const { timestamp } = req.query;
-        console.log("timeStamp: ", timestamp)
-        console.log("type of timestamp: ", typeof(timestamp));
-
-        
         let today = new Date(); 
         let yesterday = new Date(today); 
         let oneWeek = new Date(today); 
@@ -387,9 +371,7 @@ AnalyticsController.getQuizScopeData = async(req, res) =>{
 
 
         const userId = req.user.id; 
-        console.log("creator user id : ", userId)
         const user = await AdminUser.findById({_id : userId}); 
-        console.log("Creator User", user)
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
@@ -448,7 +430,6 @@ AnalyticsController.getQuizScopeData = async(req, res) =>{
         if(timestamp && timestamp === 'allTime'){
             query = {...query, }
         }
-        console.log("query", query); 
         const quizScopes = await Quiz.aggregate([
             { $match: query },
             {
@@ -465,7 +446,6 @@ AnalyticsController.getQuizScopeData = async(req, res) =>{
                 }
             }
         ]);
-        console.log(quizScopes); 
         return res.status(200).json(quizScopes);
 
     } catch (error) {
@@ -476,10 +456,6 @@ AnalyticsController.getQuizScopeData = async(req, res) =>{
 AnalyticsController.getParticipationData = async(req, res) => {
     try {
         const { timestamp } = req.query;
-        console.log("timeStamp: ", timestamp)
-        console.log("type of timestamp: ", typeof(timestamp));
-
-        
         let today = new Date(); 
         let yesterday = new Date(today); 
         let oneWeek = new Date(today); 
@@ -506,9 +482,7 @@ AnalyticsController.getParticipationData = async(req, res) => {
 
 
         const userId = req.user.id; 
-        console.log("creator user id : ", userId)
         const user = await AdminUser.findById({_id : userId}); 
-        console.log("Creator User", user)
         if(!user){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }; 
@@ -568,11 +542,100 @@ AnalyticsController.getParticipationData = async(req, res) => {
         if(timestamp && timestamp === 'allTime'){
             query = {...query, }
         }
-        console.log("query", query)
         let participantCount =  await VisitorUser.countDocuments(query)
-        console.log(participantCount); 
         res.status(200).json(participantCount); 
 
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res); 
+    }
+}; 
+// TODO : Quiz level analytics 
+AnalyticsController.QuizAtendeeCount = async(req, res) =>{
+    try {
+        const userId = req.user.id; 
+        const quizId = req.query.quizId; 
+        const user =  await AdminUser.findById({_id : userId}); 
+        if(!user){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+        }
+        const quiz = await Quiz.findById({_id: quizId}); 
+        if(!quiz){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND)
+        }
+        const attendeeCount = await VisitorUser.countDocuments({quizId : quizId}); 
+        res.status(200).json(attendeeCount); 
+    } catch (error) {
+        return ErrorUtils.APIErrorResponse(res); 
+    }
+}; 
+AnalyticsController.QuizAttendeesRating = async(req, res) =>{
+    try {
+        const userId = req.user.id; 
+        const quizId = req.query.quizId; 
+        const objectId = new mongoose.Types.ObjectId(quizId);
+        const user =  await AdminUser.findById({_id : userId}); 
+        if(!user){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+        }
+        const quiz = await Quiz.findById({_id: quizId}); 
+        if(!quiz){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND)
+        }
+        let query = {quizId : objectId} 
+        let List = await QuizParticipation.aggregate([
+            { $match : query}, 
+            {
+             $group : {
+                 _id: "$feedback",
+                 count: { $sum: 1 }
+             }
+            }, 
+            {
+             $project: {
+                 rating: "$_id",
+                 count: 1,
+                 _id: 0
+             }
+             }
+         ]); 
+         res.status(200).json(List)
+    } catch (error) {
+        console.log(error); 
+        return ErrorUtils.APIErrorResponse(res); 
+    }
+}
+AnalyticsController.quizComplete = async(req, res) =>{
+    try {
+        const userId = req.user.id; 
+        const quizId = req.query.quizId; 
+        const objectId = new mongoose.Types.ObjectId(quizId);
+        const user =  await AdminUser.findById({_id : userId}); 
+        if(!user){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
+        }
+        const quiz = await Quiz.findById({_id: quizId}); 
+        if(!quiz){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_QUIZ_FOUND)
+        }
+        let query = {quizId : objectId} 
+        const list = await QuizParticipation.aggregate([
+            { $match : query}, 
+            {
+             $group : {
+                 _id: "$isComplete",
+                 count: { $sum: 1 }
+             }
+            }, 
+            {
+             $project: {
+                 isComplete: "$_id",
+                 count: 1,
+                 _id: 0
+             }
+             }
+        ]); 
+        return res.status(200).json(list)  
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res); 
