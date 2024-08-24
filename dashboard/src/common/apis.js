@@ -101,6 +101,18 @@ const API = {
     getQuizByScope : async(payload) =>{
       let filter = payload; 
       return await axios.get(`${API_BASE_URL}/api/v1/quiz-scope?timestamp=${filter}`, getHeadersWithToken())
+    },
+    getQuizAttendeeCount : async(payload) => {
+      let quizId = payload
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-attendee-count?quizId=${quizId}`, getHeadersWithToken());
+    }, 
+    getAttendeesQuizRating : async(payload) => {
+      let quizId = payload
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-attendee-rating?quizId=${quizId}`, getHeadersWithToken());
+    }, 
+    getQuizCompletionRatio : async(payload) => {
+      let quizId = payload
+      return await axios.get(`${API_BASE_URL}/api/v1/quizs-play-status?quizId=${quizId}`, getHeadersWithToken());
     }
   };
 export default API; 

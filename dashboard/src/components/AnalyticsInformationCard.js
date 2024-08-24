@@ -19,7 +19,7 @@ const AnalyticsInformationCard = ({heading, data}) => {
       }}
     >
      <Paper elevation={3} square={false}>
-        <Typography variant='h6' sx={{ fontWeight: 'bold', fontFamily: 'Monospace', color: 'primary.main' }}>
+        <Typography variant='h6' sx={{ fontWeight: 'bold', fontFamily: 'Monospace', color: 'primary.main',  }}>
             {heading}
         </Typography>
         <Divider />

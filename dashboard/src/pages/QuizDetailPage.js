@@ -7,6 +7,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { QuizBasicDetails } from '../components/QuizBasicDetails'; 
 
 
+
 const QuizDetailPage = () => {
     const [anchorEl, setAnchorEl] = useState(null); 
     const handleClick = (event) => {
@@ -45,7 +46,6 @@ const QuizDetailPage = () => {
     {/* Quiz Basic Details */} 
     <div className='flex  justify-center'>
         <QuizBasicDetails 
-        // quizId = {quizId}
         />
     </div>
     </Box>
