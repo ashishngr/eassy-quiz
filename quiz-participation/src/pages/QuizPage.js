@@ -25,7 +25,6 @@ const QuizPage = () => {
   useEffect(() => {
     if (timer === 0) {
       handleOptionDisable(currentQuestionIndex); // Disable options when time is up
-
       // Capture as 'Unanswered' if no option was selected when time ran out
       if (!selectedOptions[currentQuestionIndex]) {
         const unansweredResult = {
