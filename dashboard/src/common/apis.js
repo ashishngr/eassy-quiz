@@ -85,6 +85,22 @@ const API = {
     getQuizParticipationRating : async(payload) =>{
       let filter = payload; 
       return await axios.get(`${API_BASE_URL}/api/v1/quiz-feedback?timestamp=${filter}`, getHeadersWithToken())
+    },
+    getQuizCompletionData : async(payload) => {
+      let filter = payload; 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-completion?timestamp=${filter}`, getHeadersWithToken())
+    }, 
+    getQuizCount : async(payload) => {
+      let filter = payload; 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-count?timestamp=${filter}`, getHeadersWithToken())
+    }, 
+    getParticipantCount : async(payload) =>{
+      let filter = payload; 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-participant?timestamp=${filter}`, getHeadersWithToken())
+    }, 
+    getQuizByScope : async(payload) =>{
+      let filter = payload; 
+      return await axios.get(`${API_BASE_URL}/api/v1/quiz-scope?timestamp=${filter}`, getHeadersWithToken())
     }
   };
 export default API; 

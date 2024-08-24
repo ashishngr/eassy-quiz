@@ -7,11 +7,13 @@ import { BarChart } from '@mui/x-charts/BarChart';
 const chartSetting = {
     yAxis: [{ label: 'Number of Users' }],
     height: 300,
+    width: 500
 };
 
 const valueFormatter = (value) => `${value} Users`;
 
 const QuizFeedBackGraph = ({ratingData}) => {
+    
     if (!ratingData || ratingData.length === 0) {
         return <div>No data available</div>;
     }
@@ -43,5 +45,4 @@ const QuizFeedBackGraph = ({ratingData}) => {
     </div>
   )
 }
-
-export default QuizFeedBackGraph
+export default QuizFeedBackGraph 

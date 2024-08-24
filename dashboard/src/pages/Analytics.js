@@ -18,11 +18,19 @@ import {
 
 } from '@mui/material';
 import QuizFeedBackGraph from '../components/QuizFeedBackGraph';
+import QuizCompletionGraph from '../components/QuizCompletionGraph';
+import AnalyticsInformationCard from '../components/AnalyticsInformationCard'; 
+import QuizScopeGraph from '../components/QuizScopeGraph';
 
 const Analytics = () => {
   const [filter, setFilter] = useState('today');
   const [anchorEl, setAnchorEl] = useState(null); 
-  const [ratingData, setRatingData] = useState([])
+  const [ratingData, setRatingData] = useState([]);
+  const [quizCompletionData, setQuizCompletionData] = useState([]); 
+  const [totalQuiz, setTotalQuiz] = useState(0);
+  const [totalParticipants, setTotolParticipants] = useState(0); 
+  const [quizScopeCount, setQuizScopeCount] = useState([]); 
+
   const handleClick = (event) => {
     // Ensure the event object is passed correctly
     setAnchorEl(event.currentTarget);
@@ -31,12 +39,18 @@ const Analytics = () => {
     setAnchorEl(null);
   };
   const isPopoverOpen = Boolean(anchorEl);
+
   const handleFilterChange = (filterValue) => {
     const selectedFilter = filterValue;
     setFilter(selectedFilter);
     //triggere API call based on 
     fetchQuizRatingsData(selectedFilter);
+    fetchQuizCompletionData(selectedFilter); 
+    fetchQuizCount(selectedFilter); 
+    fetchParticipantCount(selectedFilter); 
+    fetchQuizByScope(selectedFilter)
   };
+
   const fetchQuizRatingsData = async(filter) =>{
     try {
     const response = await API.getQuizParticipationRating(filter);
@@ -48,18 +62,71 @@ const Analytics = () => {
       console.log(error)
     }
   }; 
+  const fetchQuizCompletionData = async(filter) =>{
+    try {
+      const response = await API.getQuizCompletionData(filter); 
+      console.log("response quiz completion", response.data); 
+      if(response.status === 200){
+        setQuizCompletionData(response.data)
+      }
+    } catch (error) {
+      console.log(error); 
+    }
+  }; 
+  const fetchQuizCount = async(filter) =>{
+    try {
+      const response = await API.getQuizCount(filter)
+      console.log("response quiz count", response.data); 
+      if(response.status === 200){
+        setTotalQuiz(response?.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const fetchParticipantCount = async(filter) =>{
+    try {
+      const response = await API.getParticipantCount(filter)
+      console.log("response participant count", response); 
+      if(response.status === 200){
+        setTotolParticipants(response?.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const fetchQuizByScope = async(filter) =>{
+    try {
+      const response = await API.getQuizByScope(filter)
+      console.log("response quiz scope", response.data); 
+      try {
+        const response = await API.getQuizByScope(filter)
+        console.log("response participant count", response); 
+        if(response.status === 200){
+          setQuizScopeCount(response?.data)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
   useEffect(()=>{
-    fetchQuizRatingsData('today')
+    fetchQuizRatingsData('today'); 
+    fetchQuizCompletionData('today'); 
+    fetchQuizCount('today'); 
+    fetchParticipantCount('today'); 
+    fetchQuizByScope('today')
   },[]); 
 
   return (
     <div>
-    <Box sx={{ textAlign: 'center', mt: 1 }}>
+    <Box sx={{ textAlign: 'center', mt: 1}}>
       {/* Main Heading */}
       <Typography variant="h3" gutterBottom>
         Analytics
       </Typography>
-
       {/* Search by Filter and More Filter Button */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mt: 2 }}>
         <FormControl variant="outlined" sx={{ minWidth: 200 }}>
@@ -127,10 +194,19 @@ const Analytics = () => {
       </Popover>
     </div>
       </Box>
+      <div className='flex flex-row justify-center m-3 space-x-8' >
+        <AnalyticsInformationCard heading={"Quiz Count"} data={totalQuiz}/>
+        <AnalyticsInformationCard heading={"Attendees"} data={totalParticipants}/>
+      </div>
+      
+     
     </Box>
-    <div className='flex flex-row p-10 max-w-full'>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding:'10' }}>
       <QuizFeedBackGraph ratingData={ratingData} />
-      <QuizFeedBackGraph ratingData={ratingData} />
+      <QuizCompletionGraph data={quizCompletionData} />
+    </div>
+    <div className='mt-3'>
+      <QuizScopeGraph data={quizScopeCount}/>
     </div>
   </div>  
   )
