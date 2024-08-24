@@ -25,7 +25,7 @@ const QuizPage = () => {
   useEffect(() => {
     if (timer === 0) {
       handleOptionDisable(currentQuestionIndex); // Disable options when time is up
-      
+
       // Capture as 'Unanswered' if no option was selected when time ran out
       if (!selectedOptions[currentQuestionIndex]) {
         const unansweredResult = {
@@ -38,21 +38,21 @@ const QuizPage = () => {
         newSelectedOptions[currentQuestionIndex] = unansweredResult;
         setSelectedOptions(newSelectedOptions);
       }
-  
+
       return;
     }
-  
+
     if (
       selectedOptions[currentQuestionIndex] ||
       disabledOptions.includes(currentQuestionIndex)
     ) {
       return;
     }
-  
+
     const interval = setInterval(() => {
       setTimer((prevTimer) => prevTimer - 1);
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, [timer, currentQuestionIndex]);
 
@@ -117,11 +117,11 @@ const QuizPage = () => {
   };
 
   // Navigate to previous question
-const handlePreviousQuestion = () => {
-  if (currentQuestionIndex > 0) {
-    setCurrentQuestionIndex(currentQuestionIndex - 1);
-  }
-};
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
 
   // Navigate to next question
   const handleNextQuestion = () => {
@@ -141,53 +141,67 @@ const handlePreviousQuestion = () => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setTimer(40);
     } else {
-      let id = localStorage.getItem("visitorUserId")
+      let id = localStorage.getItem("visitorUserId");
       navigateToSummary(id);
     }
   };
 
   // Handle skip to end functionality
-  const handleSkipToEnd = async() => {
+  const handleSkipToEnd = async () => {
     const remainingQuestions = questions.slice(currentQuestionIndex);
     // Capture results for remaining questions as unanswered
     let skippedResults = [];
     if (remainingQuestions.length > 0) {
-        skippedResults = remainingQuestions.map((question, index) => ({
-            text: question.text,
-            userSubmittedOption: "Skipped",
-            correctOption: correctOptions[currentQuestionIndex + index],
-            points: 0,
-        }));
+      skippedResults = remainingQuestions.map((question, index) => ({
+        text: question.text,
+        userSubmittedOption: "Skipped",
+        correctOption: correctOptions[currentQuestionIndex + index],
+        points: 0,
+      }));
     }
     // Combine previously selected options with skipped results
     const finalResults = [...selectedOptions, ...skippedResults];
-    setSelectedOptions(finalResults); 
+    setSelectedOptions(finalResults);
     // Determine if the quiz is complete
-    const isComplete = finalResults.length === questions.length; 
+    const isComplete = finalResults.length - 1 === questions.length;
+
     // Extract participantId from local storage
-    const participantId = localStorage.getItem('visitorUserId');
-    const creatorUserId = localStorage.getItem('creatorUserId');  
+    const participantId = localStorage.getItem("visitorUserId");
+    const creatorUserId = localStorage.getItem("creatorUserId");
     // Calculate final score
-    const finalScore = finalResults.reduce((total, result) => total + result.points, 0); 
-     // Determine right, wrong, and skipped questions
-     const rightQuestions = finalResults.filter(result => result.points > 0).length;
-     const wrongQuestions = finalResults.filter(result => result.points === 0 && result.userSubmittedOption !== "Skipped").length;
-    const skipedQuestions = finalResults.filter(result => result.userSubmittedOption === "Skipped").length;
+    const finalScore = finalResults.reduce(
+      (total, result) => total + result.points,
+      0
+    );
+    // Determine right, wrong, and skipped questions
+    const rightQuestions = finalResults.filter(
+      (result) => result.points > 0
+    ).length;
+    const wrongQuestions = finalResults.filter(
+      (result) =>
+        result.points === 0 && result.userSubmittedOption !== "Skipped"
+    ).length;
+    const skipedQuestions = finalResults.filter(
+      (result) => result.userSubmittedOption === "Skipped"
+    ).length;
     try {
       // API call to save quiz participation data to the database
-      const response = await axios.post(`http://localhost:8080/api/v1/quiz-participation`, {
-            quizId,                       // Quiz ID
-            participantId,   
-            creatorUserId,          // Participant ID
-            isComplete: isComplete,       // Quiz completion status
-            finalScore,                   // Final score
-            rightQuestions,               // List of right question numbers
-            wrongQuestions,               // List of wrong question numbers
-            skipedQuestions,             // List of skipped question numbers
-            questions: finalResults,      // Full quiz results 
-      });
-      const id = response.data.puizParticipationId; 
-      localStorage.setItem('participationId', id );
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/quiz-participation`,
+        {
+          quizId, // Quiz ID
+          participantId,
+          creatorUserId, // Participant ID
+          isComplete: isComplete, // Quiz completion status
+          finalScore, // Final score
+          rightQuestions, // List of right question numbers
+          wrongQuestions, // List of wrong question numbers
+          skipedQuestions, // List of skipped question numbers
+          questions: finalResults, // Full quiz results
+        }
+      );
+      const id = response.data.puizParticipationId;
+      localStorage.setItem("participationId", id);
 
       // Navigate to the summary page after successful save
       navigateToSummary(id);
@@ -239,24 +253,27 @@ const handlePreviousQuestion = () => {
             </div>
 
             <div className="flex flex-col flex-wrap gap-5 mb-4">
-              {questions[currentQuestionIndex]?.options.map(
-                (option, index) => (
-                  <button
-                    key={index}
-                    className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 
-                      ${selectedOptions[currentQuestionIndex]?.userSubmittedOption === option ? "bg-green-200" : ""} 
+              {questions[currentQuestionIndex]?.options.map((option, index) => (
+                <button
+                  key={index}
+                  className={`bg-gray-100 border border-gray-100 shadow-md p-6 rounded-lg flex-1 
+                      ${
+                        selectedOptions[currentQuestionIndex]
+                          ?.userSubmittedOption === option
+                          ? "bg-green-200"
+                          : ""
+                      } 
                     `}
-                    onClick={() => handleOptionClick(option)}
-                    disabled={
-                      timer === 0 ||
-                      disabledOptions.includes(currentQuestionIndex) ||
-                      selectedOptions[currentQuestionIndex]
-                    }
-                  >
-                    {option}
-                  </button>
-                )
-              )}
+                  onClick={() => handleOptionClick(option)}
+                  disabled={
+                    timer === 0 ||
+                    disabledOptions.includes(currentQuestionIndex) ||
+                    selectedOptions[currentQuestionIndex]
+                  }
+                >
+                  {option}
+                </button>
+              ))}
             </div>
             <div className="text-center flex justify-center items-center gap-4">
               <button
