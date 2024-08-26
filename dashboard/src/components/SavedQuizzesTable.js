@@ -10,11 +10,9 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-
-
+import ThreeDotDropdown from "./ThreeDotDropdown";
 
 const SavedQuizzesTable = ({ quizzes }) => {
-
 // Check if quizzes is an array and if it has any quizzes
 const hasQuizzes = Array.isArray(quizzes) && quizzes.length > 0;
   
@@ -44,12 +42,7 @@ const hasQuizzes = Array.isArray(quizzes) && quizzes.length > 0;
                   <TableCell>{quiz.title}</TableCell>
                   <TableCell>{quiz.creatorUserName}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" color="primary">
-                      View
-                    </Button>
-                    <Button variant="outlined" color="secondary">
-                      Play
-                    </Button>
+                  < ThreeDotDropdown quizId={quiz.id}/>
                   </TableCell>
                 </TableRow>
               ))

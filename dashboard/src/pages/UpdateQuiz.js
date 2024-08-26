@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-
 import { Box, TextField, MenuItem, Grid, Button, Paper, List, ListItem, ListItemText, } from '@mui/material';
-
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../common/apis';
 
@@ -67,7 +66,9 @@ const UpdateQuiz = () => {
   const handleAddQuestion = () => {
     navigate(`/admin/dashboard/quiz/${id}/add-question`);
   };
-
+  const handleBack = () =>{
+    navigate('/admin/dashboard/quiz')
+  }
 
   return (
     <Box
@@ -81,6 +82,7 @@ const UpdateQuiz = () => {
       }}
     >
       <Paper sx={{ padding: 4, maxWidth: 800, width: '100%' }}>
+        <Button onClick={handleBack}><span><KeyboardBackspaceIcon /></span>Back</Button>
        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
           <Typography variant="h4" component="h1">
             Edit Quiz
