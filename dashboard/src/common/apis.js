@@ -113,6 +113,9 @@ const API = {
     getQuizCompletionRatio : async(payload) => {
       let quizId = payload
       return await axios.get(`${API_BASE_URL}/api/v1/quizs-play-status?quizId=${quizId}`, getHeadersWithToken());
+    }, 
+    updateQuiz : async(quizId, payload) =>{
+      return await axios.put(`${API_BASE_URL}/api/v1/quiz/${quizId}`, payload, getHeadersWithToken());
     }
   };
 export default API; 

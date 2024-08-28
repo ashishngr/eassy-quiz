@@ -9,13 +9,15 @@ import API from '../common/apis';
 
 
 const difficulty = ["Eassy", "Medium", "Hard"];
-const scopes = ['Public', 'Private', 'IsShared'];
+const scope = ['Public', 'Private', 'IsShared'];
 const statuses = ['Published', 'Draft', 'Deleted'];
 
 
 const UpdateQuiz = () => { 
 
   const { id } = useParams();
+  console.log("id----", id)
+
   const navigate = useNavigate();
   const [quizData, setQuizData] = useState({
     title: '',
@@ -57,12 +59,29 @@ const UpdateQuiz = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log("Name", name)
+    console.log("value", value)
     setQuizData((prevData) => ({ ...prevData, [name]: value }));
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
     // Handle form submission logic here
+    console.log("updated quiz data", quizData); 
+    try {
+      const updateData = {
+        ...quizData,
+        sharedEmails: quizData.sharedEmail.split(',').map(email => email.trim()) // Convert back to array
+      }; 
+
+      const response = await API.updateQuiz(id, updateData);
+      console.log("Quiz updated successfully:", response.data);
+      navigate('/admin/dashboard/quiz'); // Navigate back to quiz list after successful update
+    } catch (error) {
+      console.error("Error updating quiz:", error);
+    }
   };
+
   const handleAddQuestion = () => {
     navigate(`/admin/dashboard/quiz/${id}/add-question`);
   };
@@ -150,7 +169,7 @@ const UpdateQuiz = () => {
                 value={quizData.scope}
                 onChange={handleChange}
               >
-                {scopes.map((option) => (
+                {scope.map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}
                   </MenuItem>
