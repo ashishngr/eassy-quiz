@@ -309,7 +309,7 @@ QuizController.getSaveQuizes = async(req, res) =>{
     if(!user){
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }
-    try {
+    try {      
     const quizzes = await Quiz.find({ savedBy: { $in: [new mongoose.Types.ObjectId(userId)] } }).exec();
     if (!quizzes ||  quizzes.length === 0) {
       return res.status(200).json({
