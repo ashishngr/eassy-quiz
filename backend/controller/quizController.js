@@ -341,22 +341,55 @@ QuizController.getPublicQuizzes = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
     }
     try {
-        const PublicQuizzes = await Quiz.find({ scope: 'Public' }); 
-        if(!PublicQuizzes){
-            return ErrorUtils.APIErrorResponse(res, ERRORS.NO_PUBLIC_QUIZZ); 
+        var {limit, page} = req.query; 
+        if(!limit || !page){
+            return ErrorUtils.APIErrorResponse(res, ERRORS.PAGINATION_ERROR); 
+        }
+        page = page || 1; 
+        limit = limit || 5; 
+        let skip = (page - 1) * limit; 
+        let query = {
+            creatorUserId : new ObjectId(userId), 
+            scope: 'Public'
+        }; 
+        const publicQuiz = await Quiz.aggregate([
+            {
+                $match : query
+            }, 
+            {
+                $sort : {created_at : -1}
+            }, 
+            {
+                $skip : skip
+            },
+            {
+                $limit : parseInt(limit)
+            }
+        ]); 
+
+
+        if(!publicQuiz){
+            return "No Public Quiz Found"
         }
         // Shuffle the quizzes 
-        const shuffledQuizzes = PublicQuizzes.sort(() => 0.5 - Math.random()); 
-        const topTenQuizzes = shuffledQuizzes.slice(0, 10); 
-        const response = topTenQuizzes.map(quiz => ({
+        const shuffledQuizzes = publicQuiz.sort(() => 0.5 - Math.random()); 
+       
+        const response = shuffledQuizzes.map(quiz => ({
             id: quiz._id,
             title: quiz.title,
             description: quiz.description,
             creatorUserName: quiz.creatorUserName,
             numberOfParticipants: quiz.participants.length
         })); 
+        const totalCount = await Quiz.countDocuments(query); 
+
+        const payload = {
+            data: response, 
+            totalQuiz: totalCount, 
+            currentPage: page 
+        }
         res.status(200).json({
-            data: response
+            data: payload
         })
     } catch (error) {
         console.log(error); 
