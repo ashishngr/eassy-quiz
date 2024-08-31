@@ -10,6 +10,7 @@ import CreateQuiz from "../pages/CreateQuiz";
 
 import RequireAuth from "../common/RequireAuth";
 import QuizDetailPage from "../pages/QuizDetailPage";
+import AddQuestions from "../pages/AddQuestions";
 
 
 function AdminRoutesWrapper  () {
@@ -40,6 +41,14 @@ function AdminRoutesWrapper  () {
                     element={
                         <RequireAuth>
                             <CreateQuiz />
+                        </RequireAuth>
+                    }
+                />
+                <Route 
+                    path="quiz/:id/add-question"
+                    element={
+                        <RequireAuth>
+                            <AddQuestions />
                         </RequireAuth>
                     }
                 />
@@ -78,8 +87,7 @@ function AdminRoutesWrapper  () {
             </Route>
 
         </Routes>
-    )
-   
+    )  
 }
 
 export default AdminRoutesWrapper; 
