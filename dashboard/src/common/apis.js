@@ -61,8 +61,9 @@ const API = {
     quizStat : async() =>{
       return await axios.get(`${API_BASE_URL}/api/v1/stats`, getHeadersWithToken())
     }, 
-    publicQuiz : async() =>{
-      return await axios.get(`${API_BASE_URL}/api/v1/public`, getHeadersWithToken())
+    publicQuiz : async(params) =>{
+      const queryParams = params ? new URLSearchParams(params).toString() : "";
+      return await axios.get(`${API_BASE_URL}/api/v1/public?${queryParams}`, getHeadersWithToken())
     }, 
    
     topTenQuiz : async () =>{

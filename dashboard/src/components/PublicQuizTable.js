@@ -8,6 +8,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Typography, Button } from "@mui/material";
+import TablePagination from '@mui/material/TablePagination';
+
 
 import ThreeDotDropdown from "./ThreeDotDropdown";
 import API from "../common/apis";
@@ -31,43 +33,59 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
+
 const PublicQuizTable = () => {
   const [quizData, setQuizData] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalQuizzes, setTotalQuizzes] = useState(0);
 
-  const getPublicQuizzes = async () => {
-    await API.publicQuiz()
+  const getPublicQuizzes = async (currentPage, rowsPerPage) => {
+    await API.publicQuiz({ page: currentPage, limit: rowsPerPage })
       .then((response) => {
-        let data = response?.data.data || [];
+        console.log("response::::", response.data.data)
+        let data = response?.data.data.data || [];
         setQuizData(data);
-        console.log("Public quiz", data)
+        setTotalQuizzes(response?.data.data.totalQuizzes || [])
       })
       .catch((error) => {
         console.log("Error in fetching public quizzes", error);
       });
   };
   useEffect(() => {
-    getPublicQuizzes();
-  }, []);
+    getPublicQuizzes( page + 1 , rowsPerPage);
+  }, [page, rowsPerPage]);
+  const handlePageChange = (event, newPage) => {
+    event.preventDefault();
+    console.log("new page", newPage)
+    setPage(newPage);
+};
+const handleRowsPerPageChange = (event) => {
+  setRowsPerPage(+event.target.value);
+  setPage(0);
+};
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: 400, overflow: "auto" }}>
-      <Typography variant="h5" component="h2" gutterBottom>
-        Public Quiz
-      </Typography>
-      <Table sx={{ minWidth: 600 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Title</StyledTableCell>
-            <StyledTableCell align="right">Description</StyledTableCell>
-            <StyledTableCell align="right">Creator</StyledTableCell>
-            <StyledTableCell align="right">Participants</StyledTableCell>
-            <StyledTableCell align="right">Action</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-        {quizData.length > 0 ? (
+    <Paper>
+
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: 400, overflow: "auto" }}
+      >
+        <Typography variant="h5" component="h2" gutterBottom>
+          Public Quiz
+        </Typography>
+        <Table sx={{ minWidth: 600 }} stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Title</StyledTableCell>
+              <StyledTableCell align="right">Description</StyledTableCell>
+              <StyledTableCell align="right">Creator</StyledTableCell>
+              <StyledTableCell align="right">Participants</StyledTableCell>
+              <StyledTableCell align="right">Action</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {quizData.length > 0 ? (
               quizData.map((quiz, index) => (
                 <StyledTableRow key={index}>
                   <StyledTableCell component="th" scope="row">
@@ -83,7 +101,7 @@ const PublicQuizTable = () => {
                     {quiz.numberOfParticipants}
                   </StyledTableCell>
                   <StyledTableCell align="right">
-                    <ThreeDotDropdown quizId={quiz.id}/>
+                    <ThreeDotDropdown quizId={quiz.id} />
                   </StyledTableCell>
                 </StyledTableRow>
               ))
@@ -94,9 +112,19 @@ const PublicQuizTable = () => {
                 </StyledTableCell>
               </StyledTableRow>
             )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={totalQuizzes}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
+    </Paper>
   );
 };
 
