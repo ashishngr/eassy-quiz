@@ -401,8 +401,12 @@ QuizController.quizStats = async(req, res) => {
         // 1. Number of total quizzes created by the user
         const totalQuizzesCreated = await Quiz.countDocuments({ creatorUserId: userId });
 
-        // 2. Number of quizzes the user participated in
-        const quizzesParticipated = await Quiz.countDocuments({ participants: userId });
+        // 2. Number of Public Quizzes
+        const publicQuizzes = await Quiz.countDocuments({ scope: 'Public' });
+        // 2. Number of Private Quizzes
+        const PrivateQuizzes = await Quiz.countDocuments({ scope: 'Private' });
+        // 2. Number of Shared Quizzes
+        const sharedQuizzes = await Quiz.countDocuments({ scope: 'IsShared' });
 
         // 3. Number of unique users who participated in quizzes created by the user
         const aggregationPipeline = [
@@ -425,8 +429,9 @@ QuizController.quizStats = async(req, res) => {
 
         res.status(200).json({
             totalQuizzesCreated,
-            quizzesParticipated,
-            numUniqueParticipants,
+            publicQuizzes,
+            PrivateQuizzes,
+            sharedQuizzes, 
         });
     } catch (error) {
         console.log(error); 
