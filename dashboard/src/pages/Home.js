@@ -12,10 +12,12 @@ import API from "../common/apis";
 
 const Home = () => {
   const [quizCreated, setQuizCreated] = useState(0);
-  const [quizes, setQuizes] = useState([]);
   const [publicQuiz, setPublicQuiz] = useState(0); 
   const [privateQuiz, setPrivateQuiz] = useState(0); 
-  const [sharedQuiz, setSharedQuiz] = useState(0)
+  const [sharedQuiz, setSharedQuiz] = useState(0); 
+
+
+
 
   const navigate = useNavigate();
 
@@ -28,18 +30,9 @@ const Home = () => {
     setSharedQuiz(response?.data.sharedQuizzes); 
   };
 
-  const fetchSavedQuizes = async () => {
-    const response = await API.getSaveQuizes();
-    let data = response?.data;
-    setQuizes(data);
-  };
 
   useEffect(() => {
     fetchQuizSatat();
-  }, []);
-
-  useEffect(() => {
-    fetchSavedQuizes();
   }, []);
   const handleCreateQuiz = (event) => {
     event.preventDefault();
@@ -86,7 +79,7 @@ const Home = () => {
       {/* Two tables  - Public qiz table [most popular] || - Saved quiz [] */}
       <div className="flex flex-row mt-12 space-x-8">
         <PublicQuizTable />
-        <SavedQuizzesTable quizzes={quizes.data} />
+        <SavedQuizzesTable />
       </div>
       <div>
         <Typography variant="h5" component="h2" gutterBottom>

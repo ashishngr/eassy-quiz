@@ -75,8 +75,9 @@ const API = {
     getQuizDetails : async(quizId) => { 
       return await axios.get(`${API_BASE_URL}/api/v1/quiz/${quizId}`, getHeadersWithToken())
     }, 
-    getSaveQuizes : async() =>{
-      return await axios.get(`${API_BASE_URL}/api/v1/save-quizes`, getHeadersWithToken())
+    getSaveQuizes : async(params) =>{
+      const queryParams = params ? new URLSearchParams(params).toString() : "";
+      return await axios.get(`${API_BASE_URL}/api/v1/save-quizes?${queryParams}`, getHeadersWithToken())
     }, 
     saveQuizToLibrary : async(payload) => {
       let data = payload; 

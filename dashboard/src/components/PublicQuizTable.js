@@ -55,6 +55,7 @@ const PublicQuizTable = () => {
   useEffect(() => {
     getPublicQuizzes( page + 1 , rowsPerPage);
   }, [page, rowsPerPage]);
+  
   const handlePageChange = (event, newPage) => {
     event.preventDefault();
     console.log("new page", newPage)
