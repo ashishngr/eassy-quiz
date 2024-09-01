@@ -185,7 +185,7 @@ QuizController.getAllQuiz = async(req, res) =>  {
         if(!creatorUser){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }
-        var {limit, page} = req.query; 
+        var {limit, page, quizId, creatorUserEmail, scope, status, sortBy} = req.query; 
         if(!limit || !page){
             return ErrorUtils.APIErrorResponse(res, ERRORS.PAGINATION_ERROR); 
         }; 
@@ -194,13 +194,34 @@ QuizController.getAllQuiz = async(req, res) =>  {
         let skip = (page - 1) * limit; 
         
         let query = {creatorUserId : new ObjectId(creatorId)}; 
+        // Add filter conditions
+        if (quizId) {
+            query._id = new ObjectId(quizId);
+        }
+        if (creatorUserEmail) {
+            query.creatorUserEmail = creatorUserEmail;
+        }
+        if (scope) {
+            query.scope = scope;
+        }
+        if (status) {
+            query.status = status;
+        }
+        // Sorting logic
+        const sort = {created_at: -1};
+
+        if (sortBy === 'latest') {
+            sort.created_at = -1; // Sort by latest
+        } else if (sortBy === 'oldest') {
+            sort.created_at = 1;  // Sort by oldest
+        }
 
         const quizList = await Quiz.aggregate([
             {
                 $match : query
             }, 
             {
-                $sort : { created_at: -1 }
+                $sort : sort
             },
             {
                 $skip: skip
