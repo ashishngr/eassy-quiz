@@ -4,7 +4,7 @@ const QuizScopeGraph = ({data}) => {
 
     // Ensure the data is properly formatted
   if (!data || data.length === 0) {
-    return <div>No data available</div>;
+    data = [{ scope: 'No Data To Show On The Chart / Please change the filters', count: 0 }];
   }
 
     const formattedData = data.map((item, index) => ({

@@ -15,7 +15,7 @@ const QuizCompletionGraph = ({data}) => {
 
 
     if (!data || data.length === 0) {
-        return <div>No data available</div>;
+        data = [{ isComplete: 'No Data', count: 0 }];
     }
     const mapCompletionStatus = (status) => status ? 'Completed' : 'Not Completed';
     // Map the original data to include custom labels for isComplete

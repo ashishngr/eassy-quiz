@@ -15,10 +15,7 @@ const valueFormatter = (value) => `${value} Users`;
 const QuizFeedBackGraph = ({ratingData}) => {
     
     if (!ratingData || ratingData.length === 0) {
-        return <div>No data available</div>;
-    }
-    if (!ratingData || ratingData.length === 0) {
-    return <div>No data available</div>;
+      ratingData = [{ rating: 'No Data', value: 0 }];
     }
     const dateKeys = Object.keys(ratingData[0])?.filter(key => key !== 'rating');
     const series = dateKeys.map(dateKey => ({
