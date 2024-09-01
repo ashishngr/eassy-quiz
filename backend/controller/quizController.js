@@ -316,13 +316,49 @@ QuizController.getSaveQuizes = async(req, res) =>{
         message : "You do not have any saved quiz"
       })
     } 
-    const response = quizzes.map(quiz => ({
+    var {limit, page} = req.query; 
+    if(!limit || !page){
+        return ErrorUtils.APIErrorResponse(res, ERRORS.PAGINATION_ERROR); 
+    }
+    page = page || 1; 
+    limit = limit || 5; 
+    let skip = (page - 1) * limit; 
+    let query = {
+        creatorUserId : new ObjectId(userId), 
+        savedBy: { $in: [new mongoose.Types.ObjectId(userId)] } 
+    }; 
+    console.log(query); 
+    const savedQuizzes = await Quiz.aggregate([
+        {
+            $match : query
+        }, 
+        {
+            $sort : {created_at : -1}
+        }, 
+        {
+            $skip : skip
+        },
+        {
+            $limit : parseInt(limit)
+        }
+    ]); 
+    if(!savedQuizzes){
+        return  "No Save Quiz Found"
+    }
+    const totalCount = await Quiz.countDocuments(query); 
+    
+    const response = savedQuizzes.map(quiz => ({
         id : quiz._id,
         title: quiz.title, 
         creatorUserName: quiz.creatorUserName,
     }))
-    res.status(200).json({
+    let responseData = {
         data : response, 
+        totalCount : totalCount, 
+        currentPage : page
+    }
+    res.status(200).json({
+        data : responseData, 
         message: "Returning all the saved quizzes to your library"
     });
 
