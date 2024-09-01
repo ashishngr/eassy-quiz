@@ -35,8 +35,6 @@ const API = {
       return axios.post(`${API_BASE_URL}/api/v1/quiz`, payload, getHeadersWithToken())
     }, 
     getAllQuizes: (params) =>{
-      let newToken = StorageUtils.getAPIToken();
-      console.log("token--->", newToken )
       const queryParams = params ? new URLSearchParams(params).toString() : "";
       return  axios.get(`${API_BASE_URL}/api/v1/quiz?${queryParams}`, getHeadersWithToken() )
     }, 
