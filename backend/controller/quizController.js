@@ -269,16 +269,18 @@ QuizController.singleQuiz = async(req, res) => {
 }
 QuizController.deleteQuiz = async(req, res) =>{
     try {
-        const { id } = req.params; 
+        const { id } = req.body; 
         const creatorId = req.user.id; 
         const creatorUser = await AdminUser.find({_id: creatorId}); 
         if(!creatorUser){
             return ErrorUtils.APIErrorResponse(res, ERRORS.NO_USER_FOUND); 
         }
-        const quiz = await Quiz.findByIdAndDelete( id ); 
+        const quiz = await Quiz.findById(id);; 
         if(!quiz){
             return EmailUtils.APIErrorResponse(err, ERRORS.NO_QUIZ_FOUND);
         }
+        quiz.status = "Deleted"; 
+        await quiz.save();
         return res.status(200).json({
             message: "Quiz delete successfully"
         });
@@ -288,7 +290,6 @@ QuizController.deleteQuiz = async(req, res) =>{
         return ErrorUtils.APIErrorResponse(res);
     }
 }
-
 //TODO: API to add quizzes into library 
 QuizController.addQuizzesToLibrary = async(req, res) => {
     const creatorId = req.user.id; 
