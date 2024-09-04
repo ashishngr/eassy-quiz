@@ -1,5 +1,3 @@
-Read mE file # Quiz Application
-
 ## Introduction
 This project is a dynamic quiz application built using the MERN (MongoDB, Express, React, Node.js) stack. It allows users to create, manage, and participate in quizzes, with features such as Share the quiz participation link with any user, real-time leaderboards, feedback submission, and a secure quiz environment.
 
@@ -26,13 +24,10 @@ To install the project locally, follow these steps:
 3. **Install the dependencies**:
    ```bash
    npm start
-
 ## Backend
 The backend is built using Node.js and Express. It connects to a MongoDB database to store and retrieve quiz data.
-
 ## Frontend 
 The frontend is built using React and Material-UI, providing a responsive and interactive user interface.
-
 ## Acknowledgement 
 - **React**: A JavaScript library for building user interfaces.
 - **Material-Ui**: A popular React UI framework for designing responsive applications.
