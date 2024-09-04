@@ -5,12 +5,15 @@ import { IconButton, Menu, MenuItem, Button } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import {  useNavigate } from 'react-router-dom';
-
+import DeleteModal from "../components/DeleteModal";
 
 import { QuizBasicDetails } from "../components/QuizBasicDetails";
 
 const QuizDetailPage = () => {
+
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const handleClick = (event) => {
@@ -23,6 +26,18 @@ const QuizDetailPage = () => {
   const handleBack = () =>{
     navigate('/admin/dashboard/quiz')
   }
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+  const handleDeleteQuiz = () => {
+    // Call your delete quiz API here
+    // After successful deletion, close the modal
+    handleCloseModal();
+  };
+
 
   return (
     <Box sx={{ width: "100%", maxWidth: "100%" }}>
@@ -54,9 +69,14 @@ const QuizDetailPage = () => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Delete</MenuItem>
+            <MenuItem onClick={handleOpenModal}>Delete</MenuItem>
             <MenuItem onClick={handleClose}>Edit</MenuItem>
           </Menu>
+            <DeleteModal 
+            open={isModalOpen} 
+            handleClose={handleCloseModal} 
+            handleDelete={handleDeleteQuiz} 
+          />
         </div>
       </div>
       {/* Quiz Basic Details */}
