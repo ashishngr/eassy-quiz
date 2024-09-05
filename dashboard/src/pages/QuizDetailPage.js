@@ -4,15 +4,22 @@ import Typography from "@mui/material/Typography";
 import { IconButton, Menu, MenuItem, Button } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import {  useNavigate } from 'react-router-dom';
+import {  useNavigate, useParams } from 'react-router-dom';
 import DeleteModal from "../components/DeleteModal";
 
 import { QuizBasicDetails } from "../components/QuizBasicDetails";
+
+import API from "../common/apis";
 
 const QuizDetailPage = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+
+  const quizId = useParams().id;
+  
 
   const navigate = useNavigate();
 
@@ -32,10 +39,14 @@ const QuizDetailPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  const handleDeleteQuiz = () => {
-    // Call your delete quiz API here
-    // After successful deletion, close the modal
-    handleCloseModal();
+  const handleDeleteQuiz = async() => {
+    let data = []
+    const response = await API.deleteQuiz(quizId, data)
+    console.log("response", response); 
+    handleCloseModal(); 
+    if(response.status === 200){
+      navigate('/admin/dashboard/quiz')
+    }
   };
 
 

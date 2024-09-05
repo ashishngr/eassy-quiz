@@ -116,6 +116,9 @@ const API = {
     }, 
     updateQuiz : async(quizId, payload) =>{
       return await axios.put(`${API_BASE_URL}/api/v1/quiz/${quizId}`, payload, getHeadersWithToken());
+    }, 
+    deleteQuiz: async(quizId, data) => {
+      return await axios.put(`${API_BASE_URL}/api/v1/delete-quiz/${quizId}`, data, getHeadersWithToken()); 
     }
   };
 export default API; 
