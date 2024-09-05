@@ -269,7 +269,8 @@ QuizController.singleQuiz = async(req, res) => {
 }
 QuizController.deleteQuiz = async(req, res) =>{
     try {
-        const { id } = req.body; 
+        console.log("We are here")
+        const { id } = req.params; 
         const creatorId = req.user.id; 
         const creatorUser = await AdminUser.find({_id: creatorId}); 
         if(!creatorUser){
@@ -284,7 +285,6 @@ QuizController.deleteQuiz = async(req, res) =>{
         return res.status(200).json({
             message: "Quiz delete successfully"
         });
-
     } catch (error) {
         console.log(error); 
         return ErrorUtils.APIErrorResponse(res);
